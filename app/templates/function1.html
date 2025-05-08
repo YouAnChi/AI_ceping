@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能页面1 - Excel处理与模型评估</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>功能1: Excel 处理与模型评估</h1>
+        <hr>
+
+        <form id="excelUploadForm" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="excelFile" class="form-label">1. 上传 Excel 文件</label>
+                <input class="form-control" type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="questionColumn" class="form-label">2. 指定问题列 (例如: A)</label>
+                <input type="text" class="form-control" id="questionColumn" name="questionColumn" placeholder="A" value="A" required>
+            </div>
+
+            <h2 class="mt-4">3. 配置外部模型参数</h2>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="externalModelParam1" class="form-label">参数1</label>
+                    <input type="text" class="form-control" id="externalModelParam1" name="externalModelParam1">
+                </div>
+                <div class="col-md-6">
+                    <label for="externalModelParam2" class="form-label">参数2</label>
+                    <input type="text" class="form-control" id="externalModelParam2" name="externalModelParam2">
+                </div>
+                <!-- 可以根据需要添加更多外部模型参数 -->
+            </div>
+
+            <h2 class="mt-4">4. 配置内部模型参数</h2>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="internalModelParam1" class="form-label">参数1</label>
+                    <input type="text" class="form-control" id="internalModelParam1" name="internalModelParam1">
+                </div>
+                <div class="col-md-6">
+                    <label for="internalModelParam2" class="form-label">参数2</label>
+                    <input type="text" class="form-control" id="internalModelParam2" name="internalModelParam2">
+                </div>
+                <!-- 可以根据需要添加更多内部模型参数 -->
+            </div>
+
+            <h2 class="mt-4">5. 选择评估指标</h2>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="accuracy" id="metricAccuracy" name="metrics">
+                    <label class="form-check-label" for="metricAccuracy">
+                        准确率 (Accuracy)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="precision" id="metricPrecision" name="metrics">
+                    <label class="form-check-label" for="metricPrecision">
+                        精确率 (Precision)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="recall" id="metricRecall" name="metrics">
+                    <label class="form-check-label" for="metricRecall">
+                        召回率 (Recall)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="f1_score" id="metricF1" name="metrics">
+                    <label class="form-check-label" for="metricF1">
+                        F1 分数 (F1 Score)
+                    </label>
+                </div>
+                <!-- 可以根据需要添加更多评估指标 -->
+            </div>
+
+            <button type="submit" class="btn btn-primary">6. 生成评估结果 Excel</button>
+        </form>
+
+        <div id="resultArea" class="mt-5" style="display:none;">
+            <h2>评估结果</h2>
+            <p>处理完成！点击下方链接下载生成的Excel文件。</p>
+            <a href="#" id="downloadLink" class="btn btn-success" download>下载 Excel</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        document.getElementById('excelUploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // 在这里添加处理表单提交的逻辑，例如通过 AJAX 发送数据到后端
+            // 暂时仅显示结果区域
+            alert('表单已提交（前端模拟），后端逻辑待实现。');
+            
+            // 模拟处理成功后显示下载链接
+            const resultArea = document.getElementById('resultArea');
+            const downloadLink = document.getElementById('downloadLink');
+            // 假设后端返回了一个文件名
+            // downloadLink.href = `/download/generated_excel.xlsx`; 
+            resultArea.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
