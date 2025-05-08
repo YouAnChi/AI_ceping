@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>功能2: 文件下载 - 成研院-计支-大模型辅助通用系统</title>
+
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/carousel.css') }}" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+</head>
+<body>
+    
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">成研院-计支-大模型辅助通用系统</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+    <div class="container mt-5 pt-5"> <!-- Added pt-5 for spacing due to fixed-top navbar -->
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+        <h1>功能2: 文件下载</h1>
+        <hr>
+        <p>这里将列出可供下载的程序文件。</p>
+        
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                可执行程序A (Windows)
+                <a href="#" class="btn btn-primary btn-sm" download="programA_win.exe">下载</a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                可执行程序B (Linux)
+                <a href="#" class="btn btn-primary btn-sm" download="programB_linux">下载</a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                可执行程序C (macOS)
+                <a href="#" class="btn btn-primary btn-sm" download="programC_mac.dmg">下载</a>
+            </li>
+            <!-- 后续可以动态从后端获取文件列表 -->
+        </ul>
+    </div>
+
+    </div>
+</main>
+
+  <!-- FOOTER -->
+  <footer class="container">
+    <p class="float-end"><a href="#">Back to top</a></p>
+    <p>&copy; 2017–2024 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+  </footer>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+      
+  </body>
+</html>
