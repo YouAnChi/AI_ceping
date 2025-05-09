@@ -7,13 +7,23 @@ import os
 def create_app(config_class=Config):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config_class)
-    
-    # 创建实例文件夹
+
+    # Define and create UPLOADS_FOLDER if it doesn't exist
+    app.config['UPLOADS_FOLDER'] = os.path.join(app.instance_path, 'uploads')
+    if not os.path.exists(app.config['UPLOADS_FOLDER']):
+        os.makedirs(app.config['UPLOADS_FOLDER'])
+
+    # Define and create PROCESSED_FILES_FOLDER if it doesn't exist
+    app.config['PROCESSED_FILES_FOLDER'] = os.path.join(app.instance_path, 'processed_files')
+    if not os.path.exists(app.config['PROCESSED_FILES_FOLDER']):
+        os.makedirs(app.config['PROCESSED_FILES_FOLDER'])
+
+    # 创建实例文件夹 (如果上面没有创建instance_path的话)
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+
     # 配置日志
     log_file = app.config['LOG_FILE']
     handler = RotatingFileHandler(log_file, maxBytes=10000, backupCount=1)

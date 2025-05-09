@@ -1,43 +1,72 @@
-2025-05-08 09:57:22,247 - app - INFO - Accessed function1 at 2025-05-08 09:57:22.247118 from 127.0.0.1
-2025-05-08 09:57:23,123 - app - INFO - Accessed function2 at 2025-05-08 09:57:23.123740 from 127.0.0.1
-2025-05-08 09:57:23,688 - app - INFO - Accessed function1 at 2025-05-08 09:57:23.688505 from 127.0.0.1
-2025-05-08 09:57:24,526 - app - INFO - Accessed index page at 2025-05-08 09:57:24.526910 from 127.0.0.1
-2025-05-08 09:57:25,130 - app - INFO - Accessed function1 at 2025-05-08 09:57:25.129992 from 127.0.0.1
-2025-05-08 09:57:26,120 - app - INFO - Accessed index page at 2025-05-08 09:57:26.120440 from 127.0.0.1
-2025-05-08 09:57:26,778 - app - INFO - Accessed function1 at 2025-05-08 09:57:26.778761 from 127.0.0.1
-2025-05-08 09:57:27,767 - app - INFO - Accessed function2 at 2025-05-08 09:57:27.767887 from 127.0.0.1
-2025-05-08 09:57:28,350 - app - INFO - Accessed function1 at 2025-05-08 09:57:28.350691 from 127.0.0.1
-2025-05-08 09:57:30,339 - app - INFO - Accessed function2 at 2025-05-08 09:57:30.339730 from 127.0.0.1
-2025-05-08 09:57:30,732 - app - INFO - Accessed function1 at 2025-05-08 09:57:30.732207 from 127.0.0.1
-2025-05-08 09:57:31,300 - app - INFO - Accessed function2 at 2025-05-08 09:57:31.300353 from 127.0.0.1
-2025-05-08 09:57:31,595 - app - INFO - Accessed function1 at 2025-05-08 09:57:31.595207 from 127.0.0.1
-2025-05-08 09:57:32,036 - app - INFO - Accessed index page at 2025-05-08 09:57:32.036587 from 127.0.0.1
-2025-05-08 09:57:32,341 - app - INFO - Accessed index page at 2025-05-08 09:57:32.340969 from 127.0.0.1
-2025-05-08 09:57:32,928 - app - INFO - Accessed index page at 2025-05-08 09:57:32.928398 from 127.0.0.1
-2025-05-08 10:02:05,863 - app - INFO - Accessed index page at 2025-05-08 10:02:05.863284 from 127.0.0.1
-2025-05-08 10:02:07,234 - app - INFO - Accessed function1 at 2025-05-08 10:02:07.234042 from 127.0.0.1
-2025-05-08 10:02:08,272 - app - INFO - Accessed function2 at 2025-05-08 10:02:08.272842 from 127.0.0.1
-2025-05-08 10:02:09,059 - app - INFO - Accessed index page at 2025-05-08 10:02:09.059635 from 127.0.0.1
-2025-05-08 10:02:09,607 - app - INFO - Accessed function1 at 2025-05-08 10:02:09.607606 from 127.0.0.1
-2025-05-08 10:02:10,201 - app - INFO - Accessed function2 at 2025-05-08 10:02:10.201341 from 127.0.0.1
-2025-05-08 10:02:10,557 - app - INFO - Accessed function1 at 2025-05-08 10:02:10.557633 from 127.0.0.1
-2025-05-08 10:02:11,323 - app - INFO - Accessed function1 at 2025-05-08 10:02:11.323391 from 127.0.0.1
-2025-05-08 10:02:13,524 - app - INFO - Accessed index page at 2025-05-08 10:02:13.524785 from 127.0.0.1
-2025-05-08 10:02:14,426 - app - INFO - Accessed function1 at 2025-05-08 10:02:14.426196 from 127.0.0.1
-2025-05-08 10:02:15,129 - app - INFO - Accessed function2 at 2025-05-08 10:02:15.129576 from 127.0.0.1
-2025-05-08 10:02:15,418 - app - INFO - Accessed function1 at 2025-05-08 10:02:15.418812 from 127.0.0.1
-2025-05-08 10:02:15,882 - app - INFO - Accessed index page at 2025-05-08 10:02:15.882368 from 127.0.0.1
-2025-05-08 10:05:06,548 - app - INFO - Accessed index page at 2025-05-08 10:05:06.548436 from 127.0.0.1
-2025-05-08 10:05:07,518 - app - INFO - Accessed index page at 2025-05-08 10:05:07.518716 from 127.0.0.1
-2025-05-08 10:05:07,668 - app - INFO - Accessed index page at 2025-05-08 10:05:07.668349 from 127.0.0.1
-2025-05-08 10:05:07,848 - app - INFO - Accessed index page at 2025-05-08 10:05:07.847987 from 127.0.0.1
-2025-05-08 10:05:08,024 - app - INFO - Accessed index page at 2025-05-08 10:05:08.024048 from 127.0.0.1
-2025-05-08 10:05:08,197 - app - INFO - Accessed index page at 2025-05-08 10:05:08.196994 from 127.0.0.1
-2025-05-08 10:05:08,508 - app - INFO - Accessed index page at 2025-05-08 10:05:08.508740 from 127.0.0.1
-2025-05-08 10:05:08,677 - app - INFO - Accessed index page at 2025-05-08 10:05:08.677220 from 127.0.0.1
-2025-05-08 10:05:09,385 - app - INFO - Accessed index page at 2025-05-08 10:05:09.385637 from 127.0.0.1
-2025-05-08 10:05:10,084 - app - INFO - Accessed index page at 2025-05-08 10:05:10.084861 from 127.0.0.1
-2025-05-08 10:05:13,814 - app - INFO - Accessed function1 at 2025-05-08 10:05:13.814801 from 127.0.0.1
-2025-05-08 10:05:14,594 - app - INFO - Accessed function2 at 2025-05-08 10:05:14.594642 from 127.0.0.1
-2025-05-08 10:05:15,196 - app - INFO - Accessed index page at 2025-05-08 10:05:15.196248 from 127.0.0.1
-2025-05-08 10:05:16,579 - app - INFO - Accessed index page at 2025-05-08 10:05:16.579330 from 127.0.0.1
+2025-05-08 16:49:23,873 - app - INFO - Accessed index page at 2025-05-08 16:49:23.873416 from 127.0.0.1
+2025-05-08 16:49:25,863 - app - INFO - Accessed function1 at 2025-05-08 16:49:25.863749 from 127.0.0.1
+2025-05-08 16:49:44,944 - app - INFO - Accessed function1 at 2025-05-08 16:49:44.943999 from 127.0.0.1
+2025-05-08 16:50:47,731 - app - INFO - Accessed index page at 2025-05-08 16:50:47.731655 from 127.0.0.1
+2025-05-08 16:50:48,703 - app - INFO - Accessed index page at 2025-05-08 16:50:48.703714 from 127.0.0.1
+2025-05-08 16:50:49,210 - app - INFO - Accessed function1 at 2025-05-08 16:50:49.210010 from 127.0.0.1
+2025-05-08 16:50:50,098 - app - INFO - Accessed function2 at 2025-05-08 16:50:50.098943 from 127.0.0.1
+2025-05-08 16:50:50,857 - app - INFO - Accessed function1 at 2025-05-08 16:50:50.857116 from 127.0.0.1
+2025-05-08 17:04:00,803 - app - INFO - Accessed index page at 2025-05-08 17:04:00.803238 from 127.0.0.1
+2025-05-08 17:04:04,390 - app - INFO - Accessed function1 at 2025-05-08 17:04:04.390848 from 127.0.0.1
+2025-05-08 17:04:21,714 - app - INFO - Accessed function1 at 2025-05-08 17:04:21.714912 from 127.0.0.1
+2025-05-08 17:04:50,438 - app - INFO - Accessed function1 at 2025-05-08 17:04:50.438615 from 127.0.0.1
+2025-05-08 17:04:51,325 - app - INFO - Accessed function1 at 2025-05-08 17:04:51.324969 from 127.0.0.1
+2025-05-08 17:05:13,602 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.602788 from 127.0.0.1
+2025-05-08 17:05:13,743 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.743853 from 127.0.0.1
+2025-05-08 17:05:13,891 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.891907 from 127.0.0.1
+2025-05-08 17:21:22,246 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.246502 from 127.0.0.1
+2025-05-08 17:21:22,713 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.713069 from 127.0.0.1
+2025-05-08 17:21:22,860 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.860743 from 127.0.0.1
+2025-05-08 17:21:23,017 - app - INFO - Accessed function1 at 2025-05-08 17:21:23.017321 from 127.0.0.1
+2025-05-08 17:21:34,275 - app - INFO - Accessed function1 at 2025-05-08 17:21:34.275209 from 127.0.0.1
+2025-05-08 17:21:34,277 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 17:21:34,278 - app - INFO - Selected column: A
+2025-05-08 17:21:34,392 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172134_72e407a7.xlsx
+2025-05-08 17:22:35,396 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172134_72e407a7.xlsx
+2025-05-08 17:22:53,199 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:53.199137 from 127.0.0.1
+2025-05-08 17:22:54,709 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:54.709681 from 127.0.0.1
+2025-05-08 17:22:57,282 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:57.282424 from 127.0.0.1
+2025-05-08 17:26:04,670 - app - INFO - Accessed function1 at 2025-05-08 17:26:04.670714 from 127.0.0.1
+2025-05-08 17:26:04,675 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 17:26:04,675 - app - INFO - Selected column: A
+2025-05-08 17:26:04,774 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172604_731539a4.xlsx
+2025-05-08 17:26:22,242 - app - INFO - Accessed index page at 2025-05-08 17:26:22.242288 from 127.0.0.1
+2025-05-08 17:26:23,769 - app - INFO - Accessed function1 at 2025-05-08 17:26:23.769639 from 127.0.0.1
+2025-05-08 17:28:24,528 - app - INFO - Accessed function1 at 2025-05-08 17:28:24.528916 from 127.0.0.1
+2025-05-08 17:28:25,335 - app - INFO - Accessed function1 at 2025-05-08 17:28:25.334999 from 127.0.0.1
+2025-05-08 17:28:26,461 - app - INFO - Accessed function1 at 2025-05-08 17:28:26.461876 from 127.0.0.1
+2025-05-08 17:28:26,952 - app - INFO - Accessed function1 at 2025-05-08 17:28:26.952415 from 127.0.0.1
+2025-05-08 17:28:27,076 - app - INFO - Accessed function1 at 2025-05-08 17:28:27.076016 from 127.0.0.1
+2025-05-08 17:28:46,132 - app - INFO - Accessed function1 at 2025-05-08 17:28:46.132267 from 127.0.0.1
+2025-05-08 17:28:46,134 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 17:28:46,135 - app - INFO - Selected column: A
+2025-05-08 17:28:46,253 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172846_9f7cbfc5.xlsx
+2025-05-08 17:28:52,351 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172846_9f7cbfc5.xlsx
+2025-05-08 17:28:56,171 - app - INFO - Download request for extracted_A_20250508_172846_9f7cbfc5.xlsx at 2025-05-08 17:28:56.170965 from 127.0.0.1
+2025-05-08 18:00:47,736 - app - INFO - Accessed function1 at 2025-05-08 18:00:47.736624 from 127.0.0.1
+2025-05-08 18:00:47,739 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 18:00:47,739 - app - INFO - Selected column: A
+2025-05-08 18:00:47,874 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180047_5f3c6f96.xlsx
+2025-05-08 18:00:52,605 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180047_5f3c6f96.xlsx
+2025-05-08 18:00:58,409 - app - INFO - Accessed index page at 2025-05-08 18:00:58.409260 from 127.0.0.1
+2025-05-08 18:01:01,571 - app - INFO - Accessed function1 at 2025-05-08 18:01:01.571484 from 127.0.0.1
+2025-05-08 18:03:46,656 - app - INFO - Accessed function1 at 2025-05-08 18:03:46.656343 from 127.0.0.1
+2025-05-08 18:03:46,657 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 18:03:46,657 - app - INFO - Selected column: A
+2025-05-08 18:03:46,679 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180346_988e07b0.xlsx
+2025-05-08 18:04:46,395 - app - INFO - Accessed index page at 2025-05-08 18:04:46.395343 from 127.0.0.1
+2025-05-08 18:04:47,972 - app - INFO - Accessed function1 at 2025-05-08 18:04:47.972853 from 127.0.0.1
+2025-05-08 18:05:01,127 - app - INFO - Accessed function1 at 2025-05-08 18:05:01.127610 from 127.0.0.1
+2025-05-08 18:05:01,130 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-08 18:05:01,130 - app - INFO - Selected column: A
+2025-05-08 18:05:01,253 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180501_6490a018.xlsx
+2025-05-08 18:05:20,288 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180501_6490a018.xlsx
+2025-05-08 18:05:23,008 - app - INFO - Download request for extracted_A_20250508_180501_6490a018.xlsx at 2025-05-08 18:05:23.008599 from 127.0.0.1
+2025-05-09 14:55:31,674 - app - INFO - Accessed index page at 2025-05-09 14:55:31.674753 from 127.0.0.1
+2025-05-09 14:55:35,239 - app - INFO - Accessed function1 at 2025-05-09 14:55:35.239583 from 127.0.0.1
+2025-05-09 14:56:01,699 - app - INFO - Accessed function1 at 2025-05-09 14:56:01.699310 from 127.0.0.1
+2025-05-09 14:56:01,702 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-09 14:56:01,703 - app - INFO - Selected column: A
+2025-05-09 14:56:01,832 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250509_145601_d4170c81.xlsx
+2025-05-09 14:56:05,711 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250509_145601_d4170c81.xlsx
+2025-05-09 14:56:20,755 - app - INFO - Download request for extracted_A_20250509_145601_d4170c81.xlsx at 2025-05-09 14:56:20.755473 from 127.0.0.1
