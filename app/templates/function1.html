@@ -97,56 +97,83 @@
             <h2 class="mt-4">3. 配置外部模型参数</h2>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="externalModelParam1" class="form-label">参数1</label>
-                    <input type="text" class="form-control" id="externalModelParam1" name="externalModelParam1">
+                    <label for="external_model_key" class="form-label">API Key</label>
+                    <input type="text" class="form-control" id="external_model_key" name="external_model_key" placeholder="例如: sk-xxxxxxxx">
                 </div>
                 <div class="col-md-6">
-                    <label for="externalModelParam2" class="form-label">参数2</label>
-                    <input type="text" class="form-control" id="externalModelParam2" name="externalModelParam2">
+                    <label for="external_model_url" class="form-label">API URL</label>
+                    <input type="text" class="form-control" id="external_model_url" name="external_model_url" placeholder="例如: https://api.example.com/v1/">
                 </div>
-                <!-- 可以根据需要添加更多外部模型参数 -->
+                <div class="col-md-6">
+                    <label for="external_model_name" class="form-label">模型名称</label>
+                    <input type="text" class="form-control" id="external_model_name" name="external_model_name" placeholder="例如: gpt-3.5-turbo">
+                </div>
+                <div class="col-md-6 align-self-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="external_model_get_first_token" name="external_model_get_first_token" value="true">
+                        <label class="form-check-label" for="external_model_get_first_token">
+                            获取首Token响应时间
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <h2 class="mt-4">4. 配置内部模型参数</h2>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="internalModelParam1" class="form-label">参数1</label>
-                    <input type="text" class="form-control" id="internalModelParam1" name="internalModelParam1">
+                    <label for="internal_model_key" class="form-label">API Key</label>
+                    <input type="text" class="form-control" id="internal_model_key" name="internal_model_key" placeholder="例如: sk-yyyyyyyy">
                 </div>
                 <div class="col-md-6">
-                    <label for="internalModelParam2" class="form-label">参数2</label>
-                    <input type="text" class="form-control" id="internalModelParam2" name="internalModelParam2">
+                    <label for="internal_model_url" class="form-label">API URL</label>
+                    <input type="text" class="form-control" id="internal_model_url" name="internal_model_url" placeholder="例如: https://internal.api/v1/">
                 </div>
-                <!-- 可以根据需要添加更多内部模型参数 -->
+                <div class="col-md-6">
+                    <label for="internal_model_name" class="form-label">模型名称</label>
+                    <input type="text" class="form-control" id="internal_model_name" name="internal_model_name" placeholder="例如: internal-model-v1">
+                </div>
+                <div class="col-md-6 align-self-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="internal_model_get_first_token" name="internal_model_get_first_token" value="true">
+                        <label class="form-check-label" for="internal_model_get_first_token">
+                            获取首Token响应时间
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <h2 class="mt-4">5. 选择评估指标</h2>
             <div class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="accuracy" id="metricAccuracy" name="metrics">
-                    <label class="form-check-label" for="metricAccuracy">
-                        准确率 (Accuracy)
+                    <input class="form-check-input" type="checkbox" value="ass" id="metricASS" name="metrics">
+                    <label class="form-check-label" for="metricASS">
+                        ASS (Answer Semantic Similarity)
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="precision" id="metricPrecision" name="metrics">
-                    <label class="form-check-label" for="metricPrecision">
-                        精确率 (Precision)
+                    <input class="form-check-input" type="checkbox" value="rouge1" id="metricRouge1" name="metrics">
+                    <label class="form-check-label" for="metricRouge1">
+                        ROUGE-1
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="recall" id="metricRecall" name="metrics">
-                    <label class="form-check-label" for="metricRecall">
-                        召回率 (Recall)
+                    <input class="form-check-input" type="checkbox" value="rouge2" id="metricRouge2" name="metrics">
+                    <label class="form-check-label" for="metricRouge2">
+                        ROUGE-2
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="f1_score" id="metricF1" name="metrics">
-                    <label class="form-check-label" for="metricF1">
-                        F1 分数 (F1 Score)
+                    <input class="form-check-input" type="checkbox" value="rougel" id="metricRougeL" name="metrics">
+                    <label class="form-check-label" for="metricRougeL">
+                        ROUGE-L
                     </label>
                 </div>
-                <!-- 可以根据需要添加更多评估指标 -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="f1_chinese" id="metricF1Chinese" name="metrics">
+                    <label class="form-check-label" for="metricF1Chinese">
+                        F1值 (中文分词)
+                    </label>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary">开始处理</button>

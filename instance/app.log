@@ -1,72 +1,62 @@
-2025-05-08 16:49:23,873 - app - INFO - Accessed index page at 2025-05-08 16:49:23.873416 from 127.0.0.1
-2025-05-08 16:49:25,863 - app - INFO - Accessed function1 at 2025-05-08 16:49:25.863749 from 127.0.0.1
-2025-05-08 16:49:44,944 - app - INFO - Accessed function1 at 2025-05-08 16:49:44.943999 from 127.0.0.1
-2025-05-08 16:50:47,731 - app - INFO - Accessed index page at 2025-05-08 16:50:47.731655 from 127.0.0.1
-2025-05-08 16:50:48,703 - app - INFO - Accessed index page at 2025-05-08 16:50:48.703714 from 127.0.0.1
-2025-05-08 16:50:49,210 - app - INFO - Accessed function1 at 2025-05-08 16:50:49.210010 from 127.0.0.1
-2025-05-08 16:50:50,098 - app - INFO - Accessed function2 at 2025-05-08 16:50:50.098943 from 127.0.0.1
-2025-05-08 16:50:50,857 - app - INFO - Accessed function1 at 2025-05-08 16:50:50.857116 from 127.0.0.1
-2025-05-08 17:04:00,803 - app - INFO - Accessed index page at 2025-05-08 17:04:00.803238 from 127.0.0.1
-2025-05-08 17:04:04,390 - app - INFO - Accessed function1 at 2025-05-08 17:04:04.390848 from 127.0.0.1
-2025-05-08 17:04:21,714 - app - INFO - Accessed function1 at 2025-05-08 17:04:21.714912 from 127.0.0.1
-2025-05-08 17:04:50,438 - app - INFO - Accessed function1 at 2025-05-08 17:04:50.438615 from 127.0.0.1
-2025-05-08 17:04:51,325 - app - INFO - Accessed function1 at 2025-05-08 17:04:51.324969 from 127.0.0.1
-2025-05-08 17:05:13,602 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.602788 from 127.0.0.1
-2025-05-08 17:05:13,743 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.743853 from 127.0.0.1
-2025-05-08 17:05:13,891 - app - INFO - Accessed function1 at 2025-05-08 17:05:13.891907 from 127.0.0.1
-2025-05-08 17:21:22,246 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.246502 from 127.0.0.1
-2025-05-08 17:21:22,713 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.713069 from 127.0.0.1
-2025-05-08 17:21:22,860 - app - INFO - Accessed function1 at 2025-05-08 17:21:22.860743 from 127.0.0.1
-2025-05-08 17:21:23,017 - app - INFO - Accessed function1 at 2025-05-08 17:21:23.017321 from 127.0.0.1
-2025-05-08 17:21:34,275 - app - INFO - Accessed function1 at 2025-05-08 17:21:34.275209 from 127.0.0.1
-2025-05-08 17:21:34,277 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 17:21:34,278 - app - INFO - Selected column: A
-2025-05-08 17:21:34,392 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172134_72e407a7.xlsx
-2025-05-08 17:22:35,396 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172134_72e407a7.xlsx
-2025-05-08 17:22:53,199 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:53.199137 from 127.0.0.1
-2025-05-08 17:22:54,709 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:54.709681 from 127.0.0.1
-2025-05-08 17:22:57,282 - app - INFO - Download request for extracted_A_20250508_172134_72e407a7.xlsx at 2025-05-08 17:22:57.282424 from 127.0.0.1
-2025-05-08 17:26:04,670 - app - INFO - Accessed function1 at 2025-05-08 17:26:04.670714 from 127.0.0.1
-2025-05-08 17:26:04,675 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 17:26:04,675 - app - INFO - Selected column: A
-2025-05-08 17:26:04,774 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172604_731539a4.xlsx
-2025-05-08 17:26:22,242 - app - INFO - Accessed index page at 2025-05-08 17:26:22.242288 from 127.0.0.1
-2025-05-08 17:26:23,769 - app - INFO - Accessed function1 at 2025-05-08 17:26:23.769639 from 127.0.0.1
-2025-05-08 17:28:24,528 - app - INFO - Accessed function1 at 2025-05-08 17:28:24.528916 from 127.0.0.1
-2025-05-08 17:28:25,335 - app - INFO - Accessed function1 at 2025-05-08 17:28:25.334999 from 127.0.0.1
-2025-05-08 17:28:26,461 - app - INFO - Accessed function1 at 2025-05-08 17:28:26.461876 from 127.0.0.1
-2025-05-08 17:28:26,952 - app - INFO - Accessed function1 at 2025-05-08 17:28:26.952415 from 127.0.0.1
-2025-05-08 17:28:27,076 - app - INFO - Accessed function1 at 2025-05-08 17:28:27.076016 from 127.0.0.1
-2025-05-08 17:28:46,132 - app - INFO - Accessed function1 at 2025-05-08 17:28:46.132267 from 127.0.0.1
-2025-05-08 17:28:46,134 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 17:28:46,135 - app - INFO - Selected column: A
-2025-05-08 17:28:46,253 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172846_9f7cbfc5.xlsx
-2025-05-08 17:28:52,351 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_172846_9f7cbfc5.xlsx
-2025-05-08 17:28:56,171 - app - INFO - Download request for extracted_A_20250508_172846_9f7cbfc5.xlsx at 2025-05-08 17:28:56.170965 from 127.0.0.1
-2025-05-08 18:00:47,736 - app - INFO - Accessed function1 at 2025-05-08 18:00:47.736624 from 127.0.0.1
-2025-05-08 18:00:47,739 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 18:00:47,739 - app - INFO - Selected column: A
-2025-05-08 18:00:47,874 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180047_5f3c6f96.xlsx
-2025-05-08 18:00:52,605 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180047_5f3c6f96.xlsx
-2025-05-08 18:00:58,409 - app - INFO - Accessed index page at 2025-05-08 18:00:58.409260 from 127.0.0.1
-2025-05-08 18:01:01,571 - app - INFO - Accessed function1 at 2025-05-08 18:01:01.571484 from 127.0.0.1
-2025-05-08 18:03:46,656 - app - INFO - Accessed function1 at 2025-05-08 18:03:46.656343 from 127.0.0.1
-2025-05-08 18:03:46,657 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 18:03:46,657 - app - INFO - Selected column: A
-2025-05-08 18:03:46,679 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180346_988e07b0.xlsx
-2025-05-08 18:04:46,395 - app - INFO - Accessed index page at 2025-05-08 18:04:46.395343 from 127.0.0.1
-2025-05-08 18:04:47,972 - app - INFO - Accessed function1 at 2025-05-08 18:04:47.972853 from 127.0.0.1
-2025-05-08 18:05:01,127 - app - INFO - Accessed function1 at 2025-05-08 18:05:01.127610 from 127.0.0.1
-2025-05-08 18:05:01,130 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-08 18:05:01,130 - app - INFO - Selected column: A
-2025-05-08 18:05:01,253 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180501_6490a018.xlsx
-2025-05-08 18:05:20,288 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250508_180501_6490a018.xlsx
-2025-05-08 18:05:23,008 - app - INFO - Download request for extracted_A_20250508_180501_6490a018.xlsx at 2025-05-08 18:05:23.008599 from 127.0.0.1
-2025-05-09 14:55:31,674 - app - INFO - Accessed index page at 2025-05-09 14:55:31.674753 from 127.0.0.1
-2025-05-09 14:55:35,239 - app - INFO - Accessed function1 at 2025-05-09 14:55:35.239583 from 127.0.0.1
-2025-05-09 14:56:01,699 - app - INFO - Accessed function1 at 2025-05-09 14:56:01.699310 from 127.0.0.1
-2025-05-09 14:56:01,702 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
-2025-05-09 14:56:01,703 - app - INFO - Selected column: A
-2025-05-09 14:56:01,832 - app - INFO - Extracted column to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250509_145601_d4170c81.xlsx
-2025-05-09 14:56:05,711 - app - INFO - AI model processed file saved to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250509_145601_d4170c81.xlsx
-2025-05-09 14:56:20,755 - app - INFO - Download request for extracted_A_20250509_145601_d4170c81.xlsx at 2025-05-09 14:56:20.755473 from 127.0.0.1
+2025-05-12 16:37:58,504 - app - INFO - Accessed function1 at 2025-05-12 16:37:58.504392 from 127.0.0.1
+2025-05-12 16:37:58,677 - app - INFO - Accessed function1 at 2025-05-12 16:37:58.677196 from 127.0.0.1
+2025-05-12 16:37:59,164 - app - INFO - Accessed function1 at 2025-05-12 16:37:59.164568 from 127.0.0.1
+2025-05-12 16:38:41,330 - app - INFO - Accessed function1 at 2025-05-12 16:38:41.330959 from 127.0.0.1
+2025-05-12 16:38:41,332 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 16:38:41,333 - app - INFO - Selected column: A
+2025-05-12 16:38:41,420 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_163841_96ddb4fa.xlsx
+2025-05-12 16:38:41,420 - app - INFO - External model config: {'key': '', 'url': '', 'name': '', 'get_first_token': False}
+2025-05-12 16:38:41,420 - app - INFO - Internal model config: {'key': '', 'url': '', 'name': '', 'get_first_token': False}
+2025-05-12 16:38:41,420 - app - INFO - Selected metrics: ['ass', 'f1_chinese']
+2025-05-12 16:38:44,288 - app - ERROR - Failed to process and evaluate Excel.
+2025-05-12 16:41:08,550 - app - INFO - Accessed function1 at 2025-05-12 16:41:08.550668 from 127.0.0.1
+2025-05-12 16:41:08,552 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 16:41:08,552 - app - INFO - Selected column: A
+2025-05-12 16:41:08,646 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_164108_6d5750bf.xlsx
+2025-05-12 16:41:08,647 - app - INFO - External model config: {'key': '', 'url': '', 'name': '', 'get_first_token': False}
+2025-05-12 16:41:08,647 - app - INFO - Internal model config: {'key': '', 'url': '', 'name': '', 'get_first_token': False}
+2025-05-12 16:41:08,647 - app - INFO - Selected metrics: ['ass', 'f1_chinese']
+2025-05-12 16:41:11,195 - app - ERROR - Failed to process and evaluate Excel.
+2025-05-12 16:41:17,569 - app - INFO - Accessed index page at 2025-05-12 16:41:17.569007 from 127.0.0.1
+2025-05-12 16:41:18,849 - app - INFO - Accessed function1 at 2025-05-12 16:41:18.849426 from 127.0.0.1
+2025-05-12 16:48:51,025 - app - INFO - Accessed function1 at 2025-05-12 16:48:51.025176 from 127.0.0.1
+2025-05-12 16:48:51,027 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 16:48:51,027 - app - INFO - Selected column: A
+2025-05-12 16:48:51,043 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_164851_b53e61dd.xlsx
+2025-05-12 16:48:51,043 - app - INFO - External model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'Qwen/Qwen3-30B-A3B', 'get_first_token': False}
+2025-05-12 16:48:51,043 - app - INFO - Internal model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'internlm/internlm2_5-20b-chat', 'get_first_token': False}
+2025-05-12 16:48:51,043 - app - INFO - Selected metrics: ['ass']
+2025-05-12 16:50:35,223 - app - ERROR - Failed to process and evaluate Excel.
+2025-05-12 16:52:46,350 - app - INFO - Accessed index page at 2025-05-12 16:52:46.349951 from 127.0.0.1
+2025-05-12 16:52:51,100 - app - INFO - Accessed function1 at 2025-05-12 16:52:51.100178 from 127.0.0.1
+2025-05-12 16:53:49,966 - app - INFO - Accessed function1 at 2025-05-12 16:53:49.966561 from 127.0.0.1
+2025-05-12 16:53:49,969 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 16:53:49,969 - app - INFO - Selected column: A
+2025-05-12 16:53:50,063 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_165350_1358511d.xlsx
+2025-05-12 16:53:50,063 - app - INFO - External model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'THUDM/GLM-4-32B-0414', 'get_first_token': False}
+2025-05-12 16:53:50,063 - app - INFO - Internal model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'internlm/internlm2_5-20b-chat', 'get_first_token': False}
+2025-05-12 16:53:50,063 - app - INFO - Selected metrics: ['ass']
+2025-05-12 16:54:05,698 - app - INFO - Processing and evaluation complete. Final file: /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/eval_ready_20250512_165405_1147bf28.xlsx
+2025-05-12 16:54:10,997 - app - INFO - Download request for eval_ready_20250512_165405_1147bf28.xlsx at 2025-05-12 16:54:10.997033 from 127.0.0.1
+2025-05-12 16:57:24,342 - app - INFO - Accessed index page at 2025-05-12 16:57:24.342309 from 127.0.0.1
+2025-05-12 16:57:25,586 - app - INFO - Accessed function1 at 2025-05-12 16:57:25.586544 from 127.0.0.1
+2025-05-12 16:57:38,771 - app - INFO - Accessed function1 at 2025-05-12 16:57:38.771211 from 127.0.0.1
+2025-05-12 16:57:38,773 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 16:57:38,773 - app - INFO - Selected column: A
+2025-05-12 16:57:38,856 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_165738_99ad9fd3.xlsx
+2025-05-12 16:57:38,856 - app - INFO - External model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'THUDM/GLM-4-32B-0414', 'get_first_token': False}
+2025-05-12 16:57:38,856 - app - INFO - Internal model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'internlm/internlm2_5-20b-chat', 'get_first_token': False}
+2025-05-12 16:57:38,856 - app - INFO - Selected metrics: ['ass', 'rouge1', 'rouge2', 'rougel', 'f1_chinese']
+2025-05-12 16:57:57,794 - app - INFO - Processing and evaluation complete. Final file: /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/eval_ready_20250512_165757_55fac7bb.xlsx
+2025-05-12 16:58:01,750 - app - INFO - Download request for eval_ready_20250512_165757_55fac7bb.xlsx at 2025-05-12 16:58:01.750411 from 127.0.0.1
+2025-05-12 17:20:50,067 - app - INFO - Accessed index page at 2025-05-12 17:20:50.067397 from 127.0.0.1
+2025-05-12 17:20:57,278 - app - INFO - Accessed function1 at 2025-05-12 17:20:57.278686 from 127.0.0.1
+2025-05-12 17:21:16,295 - app - INFO - Accessed function1 at 2025-05-12 17:21:16.295355 from 127.0.0.1
+2025-05-12 17:21:16,298 - app - INFO - File 1.xlsx uploaded to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/uploads/1.xlsx
+2025-05-12 17:21:16,298 - app - INFO - Selected column: A
+2025-05-12 17:21:16,393 - app - INFO - Questions extracted to /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/extracted_A_20250512_172116_caa4640a.xlsx
+2025-05-12 17:21:16,393 - app - INFO - External model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'THUDM/GLM-4-32B-0414', 'get_first_token': True}
+2025-05-12 17:21:16,393 - app - INFO - Internal model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'internlm/internlm2_5-20b-chat', 'get_first_token': True}
+2025-05-12 17:21:16,393 - app - INFO - Selected metrics: ['ass', 'rouge1', 'rouge2', 'rougel', 'f1_chinese']
+2025-05-12 17:21:34,007 - app - INFO - Processing and evaluation complete. Final file: /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/eval_ready_20250512_172134_6f3a1da7.xlsx
+2025-05-12 17:22:36,716 - app - INFO - Download request for eval_ready_20250512_172134_6f3a1da7.xlsx at 2025-05-12 17:22:36.716793 from 127.0.0.1
