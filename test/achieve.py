@@ -4,6 +4,10 @@ from datetime import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from rouge import Rouge
+import jieba
+from modelscope.hub.snapshot_download import snapshot_download
+import shutil # Added for robustly moving files if necessary
 
 def extract_column_to_new_excel(input_excel_path, column_letter, output_dir):
     """
@@ -240,20 +244,316 @@ def process_and_evaluate_excel(questions_excel_path, output_dir, prompt,
         return None
 
 
-def excel_ragas(file_path):
-    print(f"Stub for excel_ragas called with {file_path}")
-    # TODO: Implement actual RAGAS evaluation logic
-    pass
+def convert_seconds(seconds):
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = round(seconds % 60, 2)
+    return hours, minutes, seconds
 
-def excel_rouge(file_path, rouge_type):
-    print(f"Stub for excel_rouge ({rouge_type}) called with {file_path}")
-    # TODO: Implement actual ROUGE evaluation logic
-    pass
+# Helper function to download/load model
+def get_embedding_model(model_id='yangjhchs/acge_text_embedding', fallback_model='paraphrase-multilingual-MiniLM-L12-v2'):
+    """
+    Ensures the specified sentence embedding model is available locally, downloading it if necessary,
+    and returns the SentenceTransformer model instance.
+    Uses a fallback model if the primary model download or load fails.
+    """
+    # Determine project root dynamically. __file__ is path to achieve.py
+    # os.path.dirname(__file__) is .../AI_test_utils/test
+    # project_root becomes .../AI_test_utils
+    project_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+    # Define the base directory for models within the project
+    model_base_dir = os.path.join(project_root, 'models') # Target: .../AI_test_utils/models/
+    
+    # Construct the specific path for the primary model
+    # ModelScope's snapshot_download for 'org/model_name' typically creates 'cache_dir/org/model_name'
+    # So, if model_id is 'yangjhchs/acge_text_embedding', the path inside model_base_dir will be 'yangjhchs/acge_text_embedding'
+    primary_model_target_path = os.path.join(model_base_dir, model_id)
 
-def calculate_f1_chinese(file_path):
-    print(f"Stub for calculate_f1_chinese called with {file_path}")
-    # TODO: Implement actual F1 Chinese evaluation logic
-    pass
+    try:
+        # Check if the primary model already exists at the target path and is not empty
+        if not os.path.exists(primary_model_target_path) or not os.listdir(primary_model_target_path):
+            print(f"本地模型 {primary_model_target_path} 不完整或不存在。尝试从 ModelScope 下载...")
+            os.makedirs(model_base_dir, exist_ok=True) # Ensure .../AI_test_utils/models directory exists
+            
+            # Download the model. snapshot_download will place it into a subdirectory structure
+            # within the cache_dir. For example, if cache_dir is 'models' and model_id is 'org/name',
+            # it downloads to 'models/org/name'.
+            downloaded_path = snapshot_download(model_id, cache_dir=model_base_dir)
+            
+            print(f"模型 {model_id} 已下载到 {downloaded_path}")
+            # The downloaded_path should be the same as primary_model_target_path if cache_dir is set correctly.
+            # We verify the final target path.
+            if not os.path.exists(primary_model_target_path) or not os.listdir(primary_model_target_path):
+                 raise FileNotFoundError(f"模型下载后路径 {primary_model_target_path} 仍然无效或为空。")
+            model_to_use = primary_model_target_path
+        else:
+            print(f"本地模型 {primary_model_target_path} 已存在。")
+            model_to_use = primary_model_target_path
+        
+        print(f"加载 SentenceTransformer 模型: {model_to_use}")
+        return SentenceTransformer(model_to_use)
+
+    except Exception as e:
+        print(f"处理或加载主模型 {model_id} (尝试路径: {primary_model_target_path}) 失败: {e}")
+        print(f"尝试使用后备模型: {fallback_model}")
+        # For fallback, SentenceTransformer will handle its own caching if it's an HF ID or standard model name
+        try:
+            return SentenceTransformer(fallback_model)
+        except Exception as e_fallback:
+            print(f"加载后备模型 {fallback_model} 也失败: {e_fallback}")
+            raise  # Re-raise the exception if fallback also fails
+
+def excel_ragas(input_excel_path):
+    """
+    对excel中的B列与C列进行ASS值比较，生成比较值，并写入excel中。
+
+    :param input_excel_path: 输入的Excel文件路径
+    """
+
+    # 读取Excel文件
+    df = pd.read_excel(input_excel_path)
+
+    # 检查是否有足够的列
+    if len(df.columns) < 2: # 需要至少两列用于比较 (e.g., External_Model_Response, Internal_Model_Response)
+        raise ValueError("Excel文件中至少需要两列（例如，外部模型响应和内部模型响应）来进行比较。")
+
+    # 获取第二列与第三列的内容作为问题
+    # 这些索引现在应该对应于 'External_Model_Response' 和 'Internal_Model_Response'
+    # 在 process_and_evaluate_excel 中，列的顺序是 Questions, External_Model_Response, Internal_Model_Response
+    # 因此，我们比较 df.iloc[:, 1] 和 df.iloc[:, 2]
+    questions_one = df.iloc[:, 1].dropna().tolist()
+    questions_two = df.iloc[:, 2].dropna().tolist()
+
+    if len(questions_one) != len(questions_two):
+        print("警告: 用于ASS评估的两个答案列的长度不匹配。将按较短的列表长度进行处理。")
+        min_len = min(len(questions_one), len(questions_two))
+        questions_one = questions_one[:min_len]
+        questions_two = questions_two[:min_len]
+
+    # 准备结果列
+    if 'ASS值' not in df.columns:
+        df['ASS值'] = pd.Series(dtype='float64') # Ensure float type for scores
+
+    questions_len = len(questions_one)
+    if questions_len == 0:
+        print("没有可用于ASS评估的数据。")
+        return
+    
+    # 批量数据进行ASS对比
+    print('获取嵌入模型...')
+    try:
+        model = get_embedding_model()
+    except Exception as e:
+        print(f"无法加载ASS评估所需的嵌入模型: {e}。ASS评估无法进行。")
+        return
+
+    start_time = time.time()
+    ass_scores = []
+    for index in range(questions_len):
+        reference_answer = str(questions_one[index])
+        generated_answer = str(questions_two[index])
+
+        # 计算两个答案的嵌入向量
+        embedding_1 = np.array(model.encode(reference_answer))
+        embedding_2 = np.array(model.encode(generated_answer))
+
+        print(f'进行ASS相似度计算，共{questions_len}条数据，计算第{index+1}条，请耐心等待。。。')
+
+        # 计算余弦相似度
+        norms_1 = np.linalg.norm(embedding_1, keepdims=True)
+        norms_2 = np.linalg.norm(embedding_2, keepdims=True)
+        
+        if norms_1 == 0 or norms_2 == 0:
+            similarity_score = 0.0 # Handle zero vectors
+        else:
+            embedding_1_normalized = embedding_1 / norms_1
+            embedding_2_normalized = embedding_2 / norms_2
+            similarity = embedding_1_normalized @ embedding_2_normalized.T
+            similarity_score = similarity.item() # .flatten().tolist()[0] might fail if not scalar
+
+        ass_scores.append(similarity_score)
+
+    # 将完整响应写入DataFrame
+    # Ensure the series is aligned with the original DataFrame's index for the relevant rows
+    df.loc[df.iloc[:,1].dropna().index[:questions_len], 'ASS值'] = ass_scores
+
+    # 计算耗时
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    hours, minutes, seconds = convert_seconds(elapsed_time)
+    print(f'ASS相似度计算完成，共耗时：{hours}小时{minutes}分钟{seconds}秒')
+
+    # 保存修改后的Excel文件
+    df.to_excel(input_excel_path, index=False)
+
+    print(f"ASS值已计算并保存到原文件: {input_excel_path}")
+
+def excel_rouge(input_excel_path,rouge_index='ROUGE-1'):
+    """
+    rouge 库在处理中文文本时可能会有一些问题，因为它默认是为英文设计的。
+    在 ROUGE 评估中，Precision（精确率）、Recall（召回率） 和 F1 Score（F1 分数） 是三个重要的指标，它们分别从不同的角度衡量生成文本与参考文本的相似度。
+    Precision（精确率）：精确率反映了生成文本中有多大比例的内容是与参考文本匹配的。
+    Recall（召回率）：召回率反映了参考文本中有多少内容被生成文本覆盖。
+    F1 Score（F1 分数）：F1 分数是一个综合指标，平衡了精确率和召回率。它既考虑了生成文本的质量，也考虑了生成文本的完整性。
+
+    :param input_excel_path: 输入的Excel文件路径
+    :param rouge_index: 指标，可选项为ROUGE-1、ROUGE-2、ROUGE-L，默认为ROUGE-1
+    """
+    # 读取Excel文件
+    df = pd.read_excel(input_excel_path)
+
+    # 检查是否有足够的列
+    if len(df.columns) < 2: # As per excel_ragas, expecting at least two columns for comparison
+        raise ValueError("Excel文件中至少需要两列（例如，外部模型响应和内部模型响应）来进行ROUGE评估。")
+
+    # 获取第二列与第三列的内容
+    questions_one = df.iloc[:, 1].dropna().tolist()
+    questions_two = df.iloc[:, 2].dropna().tolist()
+
+    if len(questions_one) != len(questions_two):
+        print("警告: 用于ROUGE评估的两个答案列的长度不匹配。将按较短的列表长度进行处理。")
+        min_len = min(len(questions_one), len(questions_two))
+        questions_one = questions_one[:min_len]
+        questions_two = questions_two[:min_len]
+
+    # 准备结果列
+    if rouge_index not in df.columns:
+        df[rouge_index] = pd.Series(dtype='float64')
+
+    questions_len = len(questions_one)
+    if questions_len == 0:
+        print("没有可用于ROUGE评估的数据。")
+        return
+
+    # 初始化 ROUGE 计算器
+    rouge = Rouge()
+    print('加载ROUGE评估，请耐心等待。。。')
+
+    start_time = time.time()
+    rouge_scores = []
+    for index in range(questions_len):
+        reference_answer = str(questions_one[index])
+        generated_answer = str(questions_two[index])
+
+        print(f'进行ROUGE评估 ({rouge_index})，共{questions_len}条数据，计算第{index+1}条，请耐心等待。。。')
+
+        # 处理空字符串的情况，rouge库可能无法处理
+        if not reference_answer.strip() or not generated_answer.strip():
+            print(f"警告: 第{index+1}条数据中存在空引用或生成答案，ROUGE得分将为0。")
+            rouge_f1_score = 0.0
+        else:
+            try:
+                scores = rouge.get_scores(generated_answer, reference_answer) # Note: order is hyp, ref
+                if rouge_index == 'ROUGE-1':
+                    rouge_f1_score = scores[0]['rouge-1']['f']
+                elif rouge_index == 'ROUGE-2':
+                    rouge_f1_score = scores[0]['rouge-2']['f']
+                elif rouge_index == 'ROUGE-L':
+                    rouge_f1_score = scores[0]['rouge-l']['f']
+                else:
+                    print(f"未知的ROUGE指标: {rouge_index}。将默认为0。")
+                    rouge_f1_score = 0.0
+            except Exception as e:
+                print(f"计算第{index+1}条数据ROUGE得分时出错: {e}。得分为0。")
+                rouge_f1_score = 0.0
+        
+        rouge_scores.append(rouge_f1_score)
+
+    # 将完整响应写入DataFrame
+    df.loc[df.iloc[:,1].dropna().index[:questions_len], rouge_index] = rouge_scores
+
+    # 计算耗时
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    hours, minutes, seconds_val = convert_seconds(elapsed_time)
+    print(f'ROUGE ({rouge_index})评估完成，共耗时：{hours}小时{minutes}分钟{seconds_val}秒')
+
+    # 保存修改后的Excel文件
+    df.to_excel(input_excel_path, index=False)
+
+    print(f"ROUGE ({rouge_index})值已计算并保存到原文件: {input_excel_path}")
+
+def calculate_f1_chinese(input_excel_path):
+    """
+    计算两段中文文本之间的F1值，使用jieba进行分词。
+
+    :param input_excel_path: 输入的Excel文件路径
+    """
+    # 读取Excel文件
+    df = pd.read_excel(input_excel_path)
+
+    # 检查是否有足够的列
+    if len(df.columns) < 2: # Expecting at least two columns for comparison
+        raise ValueError("Excel文件中至少需要两列（例如，外部模型响应和内部模型响应）来进行F1值评估。")
+
+    # 获取第二列与第三列的内容
+    questions_one = df.iloc[:, 1].dropna().tolist()
+    questions_two = df.iloc[:, 2].dropna().tolist()
+
+    if len(questions_one) != len(questions_two):
+        print("警告: 用于F1评估的两个答案列的长度不匹配。将按较短的列表长度进行处理。")
+        min_len = min(len(questions_one), len(questions_two))
+        questions_one = questions_one[:min_len]
+        questions_two = questions_two[:min_len]
+
+    # 准备结果列
+    if 'F1值' not in df.columns:
+        df['F1值'] = pd.Series(dtype='float64')
+
+    questions_len = len(questions_one)
+    if questions_len == 0:
+        print("没有可用于F1评估的数据。")
+        return
+
+    print('加载F1值评估（中文分词），请耐心等待。。。')
+    start_time = time.time()
+    f1_scores = []
+
+    for index in range(questions_len):
+        reference_text = str(questions_one[index])
+        generated_text = str(questions_two[index])
+
+        print(f'进行F1值评估，共{questions_len}条数据，计算第{index+1}条，请耐心等待。。。')
+
+        # 使用jieba进行分词
+        try:
+            # 添加默认词典，防止jieba未初始化
+            jieba.initialize()
+            reference_tokens = set(jieba.cut(reference_text))
+            generated_tokens = set(jieba.cut(generated_text))
+        except Exception as e:
+            print(f"Jieba分词失败: {e}。请确保jieba已正确安装。")
+            f1_scores.append(0.0)
+            continue
+
+        # 计算交集
+        intersection = reference_tokens.intersection(generated_tokens)
+
+        # 计算精确率和召回率
+        precision = len(intersection) / len(generated_tokens) if len(generated_tokens) > 0 else 0
+        recall = len(intersection) / len(reference_tokens) if len(reference_tokens) > 0 else 0
+
+        # 计算F1值
+        if precision + recall == 0:
+            f1 = 0.0
+        else:
+            f1 = 2 * (precision * recall) / (precision + recall)
+        
+        f1_scores.append(f1)
+
+    # 将完整响应写入DataFrame
+    df.loc[df.iloc[:,1].dropna().index[:questions_len], 'F1值'] = f1_scores
+
+    # 计算耗时
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    hours, minutes, seconds_val = convert_seconds(elapsed_time)
+    print(f'F1值（中文分词）评估完成，共耗时：{hours}小时{minutes}分钟{seconds_val}秒')
+
+    # 保存修改后的Excel文件
+    df.to_excel(input_excel_path, index=False)
+
+    print(f"F1值已计算并保存到原文件: {input_excel_path}")
 
 # The existing functions excel_ragas, excel_rouge, calculate_f1_chinese, convert_seconds
 # and extract_column_to_new_excel remain largely unchanged below this point.
