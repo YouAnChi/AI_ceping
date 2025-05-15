@@ -4,12 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>功能2: 文件下载 - 成研院-计支-大模型辅助通用系统</title>
+    <title>文件下载 - 成研院-技支-大模型辅助通用系统</title>
 
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/carousel.css') }}" rel="stylesheet">
 
     <style>
+      html {
+        min-height: 100vh; /* Ensure html takes full viewport height */
+      }
+      body {
+        background-image: url("{{ url_for('static', filename='images/1234.jpg') }}");
+        color: white; /* Added to make text white */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        min-height: 100vh; /* Ensure body takes at least full viewport height */
+        margin: 0; /* Remove default body margin */
+      }
       .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -30,7 +43,7 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('main.index') }}">成研院-计支-大模型辅助通用系统</a>
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">成研院-技支-大模型辅助通用系统</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -40,16 +53,12 @@
             <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
+            <a class="nav-link" href="{{ url_for('main.function1') }}">多指标AI智能分析系统</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function2') }}">文件下载</a>
           </li>
         </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
       </div>
     </div>
   </nav>
@@ -57,38 +66,21 @@
 
 <main>
     <div class="container mt-5 pt-5"> <!-- Added pt-5 for spacing due to fixed-top navbar -->
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-        <h1>功能2: 文件下载</h1>
-        <hr>
-        <p>这里将列出可供下载的程序文件。</p>
+        <h1 style="color: white;">文件下载</h1>
+        <hr style="border-top-color: rgba(255, 255, 255, 0.5);"> <!-- Adjusted hr color for visibility -->
+        <p style="color: white;">这里将列出可供下载的程序文件。</p>
         
-        <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+        <ul class="list-group" style="color: #212529;"> <!-- Set default text color for list items to dark for light bg -->
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: white;">
                 可执行程序A (Windows)
                 <a href="#" class="btn btn-primary btn-sm" download="programA_win.exe">下载</a>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: white;">
                 可执行程序B (Linux)
                 <a href="#" class="btn btn-primary btn-sm" download="programB_linux">下载</a>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: white;">
                 可执行程序C (macOS)
                 <a href="#" class="btn btn-primary btn-sm" download="programC_mac.dmg">下载</a>
             </li>
@@ -100,9 +92,9 @@
 </main>
 
   <!-- FOOTER -->
-  <footer class="container">
-    <p class="float-end"><a href="#">Back to top</a></p>
-    <p>&copy; 2017–2024 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+  <footer class="container" style="color: white;">
+    <p class="float-end"><a href="#" style="color: #f8f9fa;">Back to top</a></p>
+    <p>&copy; 2017–2024 Company, Inc. &middot; <a href="#" style="color: #f8f9fa;">Privacy</a> &middot; <a href="#" style="color: #f8f9fa;">Terms</a></p>
   </footer>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>

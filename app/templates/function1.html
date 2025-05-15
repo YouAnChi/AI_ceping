@@ -4,25 +4,210 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>功能1: Excel处理 - 成研院-计支-大模型辅助通用系统</title>
+    <title>多指标AI智能分析系统 - 成研院-技支-大模型辅助通用系统</title>
 
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/carousel.css') }}" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+        :root {
+            --primary-color: #0071e3;
+            --secondary-color: #86868b;
+            --background-color: #fbfbfd;
+            --text-color: white; /* Changed to white */
+            --border-color: rgba(255, 255, 255, 0.2); /* Adjusted for transparency */
+            --success-color: #5cb85c;
         }
-      }
+        
+        html {
+            min-height: 100vh; /* Ensure html takes full viewport height */
+        }
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            /* background-color: var(--background-color); */ /* Commented out or removed to let image show */
+            color: white; /* Changed to white */
+            line-height: 1.5;
+            letter-spacing: -0.01em;
+            background-image: url("{{ url_for('static', filename='images/1234.jpg') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            margin: 0; /* Remove default body margin */
+        }
+        
+        /* 保留自定义样式，但移除与导航栏相关的样式，使用index.html的样式 */
+        
+        .navbar-brand {
+            font-size: 1.2rem;
+        }
+        
+        /* 移除自定义导航栏样式，使用Bootstrap默认样式 */
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: white; /* Changed to white */
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: white; /* Changed to white */
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+            color: white; /* Text color for input */
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+        }
+        
+        .form-check-input {
+            width: 1.1rem;
+            height: 1.1rem;
+            margin-top: 0.25rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            font-size: 0.95rem;
+            padding-left: 0.25rem;
+            color: white; /* Changed to white */
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0062c3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-success:hover {
+            background-color: #4cae4c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert {
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-top: 2rem;
+            border: none;
+        }
+        
+        .alert-success {
+            background-color: rgba(92, 184, 92, 0.1);
+            color: #2d6a2d;
+        }
+        
+        .alert-danger {
+            background-color: rgba(217, 83, 79, 0.1);
+            color: #a94442;
+        }
+        
+        .alert-link {
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .section-container {
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        footer {
+            padding: 3rem 0;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .page-header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+        }
+        
+        .page-description {
+            font-size: 1.2rem;
+            color: white; /* Changed to white */
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
     </style>
 </head>
 <body>
@@ -30,7 +215,7 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('main.index') }}">成研院-计支-大模型辅助通用系统</a>
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">成研院-技支-大模型辅助通用系统</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -40,188 +225,185 @@
             <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">多指标AI智能分析系统</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
+            <a class="nav-link" href="{{ url_for('main.function2') }}">文件下载</a>
           </li>
         </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
       </div>
     </div>
   </nav>
 </header>
 
 <main>
-    <div class="container mt-5 pt-5"> <!-- Added pt-5 for spacing due to fixed-top navbar -->
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">首页</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">功能1: Excel处理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.function2') }}">功能2: 文件下载</a>
-                    </li>
-                </ul>
-            </div>
+    <div class="container mt-5 pt-5">
+        <div class="page-header animate-fade-in">
+            <h1>多指标AI智能分析系统</h1>
+            <p class="page-description">上传您的Excel文件，配置模型参数，选择评估指标，我们将为您提供全面的模型评估结果。</p>
         </div>
-    </nav>
-
-        <h1>功能1: Excel 处理与模型评估</h1>
-        <hr>
-
-        <form id="excelUploadForm" method="POST" action="{{ url_for('main.function1') }}" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="excelFile" class="form-label">1. 上传 Excel 文件</label>
-                <input class="form-control" type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="questionColumn" class="form-label">2. 指定问题列 (例如: A)</label>
-                <input type="text" class="form-control" id="questionColumn" name="questionColumn" placeholder="A" value="A" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="prompt" class="form-label">提示词 (可选)</label>
-                <textarea class="form-control" id="prompt" name="prompt" rows="3" placeholder="例如：你是一个英文翻译机器人，请用英文翻译提供的内容，除此之外不要输出任何其他内容。"></textarea>
-            </div>
-
-            <h2 class="mt-4">3. 配置外部模型参数</h2>
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="external_model_key" class="form-label">API Key</label>
-                    <input type="text" class="form-control" id="external_model_key" name="external_model_key" placeholder="例如: sk-xxxxxxxx">
+        
+        <div class="animate-fade-in" style="animation-delay: 0.1s;">
+            <form id="excelUploadForm" method="POST" action="{{ url_for('main.function1') }}" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="excelFile" class="form-label">1. 上传 Excel 文件</label>
+                    <input class="form-control" type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" required>
                 </div>
-                <div class="col-md-6">
-                    <label for="external_model_url" class="form-label">API URL</label>
-                    <input type="text" class="form-control" id="external_model_url" name="external_model_url" placeholder="例如: https://api.example.com/v1/">
+
+                <div class="mb-4">
+                    <label for="questionColumn" class="form-label">2. 指定问题列</label>
+                    <input type="text" class="form-control" id="questionColumn" name="questionColumn" placeholder="例如: A" value="A" required>
                 </div>
-                <div class="col-md-6">
-                    <label for="external_model_name" class="form-label">模型名称</label>
-                    <input type="text" class="form-control" id="external_model_name" name="external_model_name" placeholder="例如: gpt-3.5-turbo">
+
+                <div class="mb-4">
+                    <label for="prompt" class="form-label">提示词 (可选)</label>
+                    <textarea class="form-control" id="prompt" name="prompt" rows="3" placeholder="例如：你是一个英文翻译机器人，请用英文翻译提供的内容，除此之外不要输出任何其他内容。"></textarea>
                 </div>
-                <div class="col-md-6 align-self-end">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="external_model_get_first_token" name="external_model_get_first_token" value="true">
-                        <label class="form-check-label" for="external_model_get_first_token">
-                            获取首Token响应时间
-                        </label>
+
+                <div class="mb-4">
+                    <h2>3. 配置外部模型参数</h2>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="external_model_key" class="form-label">API Key</label>
+                            <input type="text" class="form-control" id="external_model_key" name="external_model_key" placeholder="例如: sk-xxxxxxxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="external_model_url" class="form-label">API URL</label>
+                            <input type="text" class="form-control" id="external_model_url" name="external_model_url" placeholder="例如: https://api.example.com/v1/">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="external_model_name" class="form-label">模型名称</label>
+                            <input type="text" class="form-control" id="external_model_name" name="external_model_name" placeholder="例如: gpt-3.5-turbo">
+                        </div>
+                        <div class="col-md-6 align-self-end">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="external_model_get_first_token" name="external_model_get_first_token" value="true">
+                                <label class="form-check-label" for="external_model_get_first_token">
+                                    获取首Token响应时间
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h2>4. 配置内部模型参数</h2>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="internal_model_key" class="form-label">API Key</label>
+                            <input type="text" class="form-control" id="internal_model_key" name="internal_model_key" placeholder="例如: sk-yyyyyyyy">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="internal_model_url" class="form-label">API URL</label>
+                            <input type="text" class="form-control" id="internal_model_url" name="internal_model_url" placeholder="例如: https://internal.api/v1/">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="internal_model_name" class="form-label">模型名称</label>
+                            <input type="text" class="form-control" id="internal_model_name" name="internal_model_name" placeholder="例如: internal-model-v1">
+                        </div>
+                        <div class="col-md-6 align-self-end">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="internal_model_get_first_token" name="internal_model_get_first_token" value="true">
+                                <label class="form-check-label" for="internal_model_get_first_token">
+                                    获取首Token响应时间
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h2>5. 选择评估指标</h2>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ass" id="metricASS" name="metrics">
+                                <label class="form-check-label" for="metricASS">
+                                    ASS (Answer Semantic Similarity)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="rouge1" id="metricRouge1" name="metrics">
+                                <label class="form-check-label" for="metricRouge1">
+                                    ROUGE-1
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="rouge2" id="metricRouge2" name="metrics">
+                                <label class="form-check-label" for="metricRouge2">
+                                    ROUGE-2
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="rougel" id="metricRougeL" name="metrics">
+                                <label class="form-check-label" for="metricRougeL">
+                                    ROUGE-L
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="f1_chinese" id="metricF1Chinese" name="metrics">
+                                <label class="form-check-label" for="metricF1Chinese">
+                                    F1值 (中文分词)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="f1_cilin" id="metricF1Cilin" name="metrics">
+                                <label class="form-check-label" for="metricF1Cilin">
+                                    F1值 (中文分词使用哈工大词林版)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <button type="submit" class="btn btn-primary">开始处理</button>
+                </div>
+            </form>
+        </div>
+
+        {% if error_message %}
+            <div class="alert alert-danger mt-4 animate-fade-in" role="alert">
+                {{ error_message }}
+            </div>
+        {% endif %}
+
+        {% if processed_filename %}
+            <div class="alert alert-success mt-4 animate-fade-in" role="alert">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <h4 class="alert-heading mb-2">处理成功！</h4>
+                        <p class="mb-0">您的Excel文件已成功处理完毕，可以下载查看结果。</p>
                     </div>
                 </div>
             </div>
-
-            <h2 class="mt-4">4. 配置内部模型参数</h2>
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="internal_model_key" class="form-label">API Key</label>
-                    <input type="text" class="form-control" id="internal_model_key" name="internal_model_key" placeholder="例如: sk-yyyyyyyy">
-                </div>
-                <div class="col-md-6">
-                    <label for="internal_model_url" class="form-label">API URL</label>
-                    <input type="text" class="form-control" id="internal_model_url" name="internal_model_url" placeholder="例如: https://internal.api/v1/">
-                </div>
-                <div class="col-md-6">
-                    <label for="internal_model_name" class="form-label">模型名称</label>
-                    <input type="text" class="form-control" id="internal_model_name" name="internal_model_name" placeholder="例如: internal-model-v1">
-                </div>
-                <div class="col-md-6 align-self-end">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="internal_model_get_first_token" name="internal_model_get_first_token" value="true">
-                        <label class="form-check-label" for="internal_model_get_first_token">
-                            获取首Token响应时间
-                        </label>
-                    </div>
-                </div>
+            
+            <div id="resultArea" class="mt-4 text-center animate-fade-in">
+                <h2>评估结果</h2>
+                <p class="mb-4">处理完成！点击下方按钮下载生成的Excel文件。</p>
+                <a href="{{ url_for('main.download_file', filename=processed_filename) }}" id="downloadLink" class="btn btn-success">下载 Excel 文件</a>
             </div>
-
-            <h2 class="mt-4">5. 选择评估指标</h2>
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="ass" id="metricASS" name="metrics">
-                    <label class="form-check-label" for="metricASS">
-                        ASS (Answer Semantic Similarity)
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="rouge1" id="metricRouge1" name="metrics">
-                    <label class="form-check-label" for="metricRouge1">
-                        ROUGE-1
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="rouge2" id="metricRouge2" name="metrics">
-                    <label class="form-check-label" for="metricRouge2">
-                        ROUGE-2
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="rougel" id="metricRougeL" name="metrics">
-                    <label class="form-check-label" for="metricRougeL">
-                        ROUGE-L
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="f1_chinese" id="metricF1Chinese" name="metrics">
-                    <label class="form-check-label" for="metricF1Chinese">
-                        F1值 (中文分词)
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="f1_cilin" id="metricF1Cilin" name="metrics">
-                    <label class="form-check-label" for="metricF1Cilin">
-                        F1值 (中文分词使用哈工大词林版)
-                    </label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">开始处理</button>
-        </form>
-
-    {% if error_message %}
-        <div class="alert alert-danger mt-3" role="alert">
-            {{ error_message }}
-        </div>
-    {% endif %}
-
-    {% if processed_filename %}
-        <div class="alert alert-success mt-3" role="alert">
-            文件处理成功！
-            <a href="{{ url_for('main.download_file', filename=processed_filename) }}" class="alert-link">点击此处下载处理后的文件</a>.
-        </div>
-    {% endif %}
-
-    {% if processed_filename %}
-        <div id="resultArea" class="mt-5">
-            <h2>评估结果</h2>
-            <p>处理完成！点击下方链接下载生成的Excel文件。</p>
-            <a href="{{ url_for('main.download_file', filename=processed_filename) }}" id="downloadLink" class="btn btn-success">下载 Excel</a>
-        </div>
-    {% endif %}
+        {% endif %}
     </div>
-
-    </div>
+<!-- FOOTER -->
+  <footer class="container" style="color: white;">
+    <p class="float-end"><a href="#" style="color: #f8f9fa;">Back to top</a></p>
+    <p>&copy; 2017–2021 Company, Inc. &middot; <a href="#" style="color: #f8f9fa;">Privacy</a> &middot; <a href="#" style="color: #f8f9fa;">Terms</a></p>
+  </footer>
 </main>
 
-  <!-- FOOTER -->
-  <footer class="container">
-    <p class="float-end"><a href="#">Back to top</a></p>
-    <p>&copy; 2017–2024 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
-  </footer>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script>
-        // The form submission is now handled by the backend, so the JavaScript alert is removed.
-        // The download link is now dynamically generated by Flask/Jinja2 when processed_filename is available.
-        // The resultArea visibility is also controlled by the presence of processed_filename or error_message.
-    </script>
       
   </body>
 </html>
