@@ -8,6 +8,7 @@ from rouge import Rouge
 import jieba
 from modelscope.hub.snapshot_download import snapshot_download
 import shutil # Added for robustly moving files if necessary
+from collections import defaultdict # Added for CILIN F1 calculation
 
 def extract_column_to_new_excel(input_excel_path, column_letter, output_dir):
     """
@@ -131,7 +132,199 @@ def query_ai_model_with_excel(df_input, question_column_name, output_response_co
              df_output[output_first_token_column_name] = None
         return df_output
 
+# --- Start of CILIN F1 Calculation Code ---
+CILIN_DATA = None # 初始化 CILIN_DATA，存储 (word_to_direct_synonyms, word_to_codes, code_prefix_to_words)
 
+def load_cilin(cilin_path):
+    """
+    加载哈工大词林文件。
+    每行格式可能为 '编码 词1 词2 ...' 或 '编码=词1 词2 ...'。
+    构建以下数据结构:
+    1. word_to_direct_synonyms: 词 -> {同义词集合} (同一行内的词互为同义词)
+    2. word_to_codes: 词 -> {词林编码集合} (一个词可能对应多个编码)
+    3. code_prefix_to_words: 词林编码前缀 -> {词集合} (用于层次化扩展)
+    """
+    global CILIN_DATA
+    if CILIN_DATA is not None:
+        return CILIN_DATA
+
+    word_to_direct_synonyms = defaultdict(set)
+    word_to_codes = defaultdict(set)
+    code_to_words_temp = defaultdict(set) # 临时存储完整编码到词的映射
+    code_prefix_to_words = defaultdict(set)
+
+    processed_lines = 0
+    malformed_lines = 0 # 记录格式不正确的行数
+
+    try:
+        with open(cilin_path, 'r', encoding='utf-8') as f:
+            for line_number, line_content in enumerate(f, 1):
+                line_content = line_content.strip()
+                if not line_content:
+                    continue
+
+                parts = line_content.split(None, 1) # 按第一个空格分割
+                if len(parts) < 2:
+                    parts = line_content.split('=', 1)
+                    if len(parts) < 2:
+                        malformed_lines += 1
+                        # print(f"Skipping malformed line {line_number}: {line_content} (无法分割编码和词语)")
+                        continue
+                
+                cilin_code_raw = parts[0]
+                words_str = parts[1].strip()
+                actual_code = ''.join(filter(str.isalnum, cilin_code_raw))
+
+                if not actual_code:
+                    malformed_lines +=1
+                    # print(f"Skipping malformed line {line_number}: {line_content} (编码处理后为空)")
+                    continue
+                
+                current_line_words = {word for word in words_str.split() if word}
+                if not current_line_words:
+                    malformed_lines += 1
+                    # print(f"Skipping malformed line {line_number}: {line_content} (没有有效词语)")
+                    continue
+                
+                processed_lines += 1
+                for word in current_line_words:
+                    word_to_direct_synonyms[word].update(current_line_words)
+                    word_to_codes[word].add(actual_code)
+                code_to_words_temp[actual_code].update(current_line_words)
+
+        meaningful_prefix_lengths = [1, 2, 4, 5] # 大类(1), 中类(2), 小类(4), 词群(5)
+
+        for code_val, words in code_to_words_temp.items(): # Renamed 'code' to 'code_val'
+            for length in meaningful_prefix_lengths:
+                if len(code_val) >= length:
+                    prefix = code_val[:length]
+                    code_prefix_to_words[prefix].update(words)
+        
+        CILIN_DATA = (word_to_direct_synonyms, word_to_codes, code_prefix_to_words)
+        print(f"词林加载完毕。共处理 {processed_lines} 行有效词条。")
+        if malformed_lines > 0:
+            print(f"警告：跳过了 {malformed_lines} 行格式不正确的词条。请检查词林文件格式。")
+        return CILIN_DATA
+    except FileNotFoundError:
+        print(f"错误：词林文件未找到于路径 {cilin_path}")
+        CILIN_DATA = None 
+        return None
+    except Exception as e:
+        print(f"加载词林时发生未知错误: {e}")
+        CILIN_DATA = None
+        return None
+
+def calculate_f1_with_cilin(input_excel_path, cilin_path):
+    """
+    计算两段中文文本之间的F1值，使用jieba进行分词和词林扩展。
+
+    :param input_excel_path: 输入的Excel文件路径
+    :param cilin_path: 哈工大词林文件路径
+    """
+    df = pd.read_excel(input_excel_path)
+
+    if len(df.columns) < 3:
+        print("错误: Excel文件需要至少3列（问题，模型1响应，模型2响应）才能计算F1值。")
+        if 'F1值_词林_层次化' not in df.columns:
+            df['F1值_词林_层次化'] = "列数不足"
+        else:
+            # Ensure assignment is safe even for empty df
+            if not df.empty:
+                 df.loc[df.index, 'F1值_词林_层次化'] = "列数不足"
+            else:
+                 df['F1值_词林_层次化'] = pd.Series(["列数不足"] if not df.empty else [], dtype=object)
+        df.to_excel(input_excel_path, index=False)
+        return
+
+    responses_col1_name = df.columns[1] 
+    responses_col2_name = df.columns[2] 
+
+    texts_one = df[responses_col1_name].astype(str).fillna('').tolist()
+    texts_two = df[responses_col2_name].astype(str).fillna('').tolist()
+    
+    min_len = min(len(texts_one), len(texts_two))
+    
+    output_column_name = 'F1值_词林_层次化'
+    if output_column_name not in df.columns:
+        df[output_column_name] = pd.Series([None] * len(df), dtype=object)
+
+    print('开始F1值_词林_层次化评估...')
+    start_time = time.time()
+
+    cilin_data_tuple = load_cilin(cilin_path)
+    if cilin_data_tuple is None:
+        print(f"词林数据加载失败 (路径: {cilin_path})。跳过F1值_词林_层次化评估。")
+        df[output_column_name] = "词林加载失败"
+        df.to_excel(input_excel_path, index=False)
+        return
+    word_to_direct_synonyms, word_to_codes, code_prefix_to_words = cilin_data_tuple
+
+    f1_scores = []
+    for index in range(len(df)):
+        if index >= min_len: 
+            f1_scores.append(0.0) 
+            continue
+
+        text1 = texts_one[index]
+        text2 = texts_two[index]
+        
+        tokens1 = set(jieba.cut(text1)) 
+        tokens2 = set(jieba.cut(text2)) 
+
+        expanded_tokens1 = set()
+        for token in tokens1:
+            expanded_tokens1.add(token) 
+            if token in word_to_direct_synonyms: 
+                expanded_tokens1.update(word_to_direct_synonyms[token])
+            if token in word_to_codes: 
+                for code_item in word_to_codes[token]: 
+                    prefixes_lengths = [1, 2, 4, 5] 
+                    for length in prefixes_lengths:
+                        if len(code_item) >= length:
+                            prefix = code_item[:length]
+                            if prefix in code_prefix_to_words:
+                                expanded_tokens1.update(code_prefix_to_words[prefix])
+        
+        expanded_tokens2 = set()
+        for token in tokens2:
+            expanded_tokens2.add(token) 
+            if token in word_to_direct_synonyms: 
+                expanded_tokens2.update(word_to_direct_synonyms[token])
+            if token in word_to_codes: 
+                for code_item in word_to_codes[token]: 
+                    prefixes_lengths = [1, 2, 4, 5]
+                    for length in prefixes_lengths:
+                        if len(code_item) >= length:
+                            prefix = code_item[:length]
+                            if prefix in code_prefix_to_words:
+                                expanded_tokens2.update(code_prefix_to_words[prefix])
+
+        intersection = expanded_tokens1.intersection(expanded_tokens2)
+        
+        precision = len(intersection) / len(expanded_tokens2) if expanded_tokens2 else 0.0
+        recall = len(intersection) / len(expanded_tokens1) if expanded_tokens1 else 0.0
+
+        if precision + recall == 0:
+            f1 = 0.0
+        else:
+            f1 = 2 * (precision * recall) / (precision + recall)
+        
+        f1_scores.append(f1)
+    
+    # Ensure f1_scores has an entry for every row in df, padding with 0.0 if necessary
+    if len(f1_scores) < len(df):
+        f1_scores.extend([0.0] * (len(df) - len(f1_scores)))
+    
+    df[output_column_name] = pd.Series(f1_scores, index=df.index)
+
+    elapsed_time = time.time() - start_time
+    hours, minutes, seconds_val = convert_seconds(elapsed_time)
+    print(f'F1值_词林_层次化计算完成，共耗时：{hours}小时{minutes}分钟{seconds_val}秒。处理了 {len(f1_scores)} 条记录。')
+
+    df.to_excel(input_excel_path, index=False)
+    print(f"F1值_词林_层次化结果已更新到文件: {input_excel_path}")
+
+# --- End of CILIN F1 Calculation Code ---
 
 def process_and_evaluate_excel(questions_excel_path, output_dir, prompt,
                                external_model_config, internal_model_config,
@@ -233,6 +426,26 @@ def process_and_evaluate_excel(questions_excel_path, output_dir, prompt,
             if 'f1_chinese' in selected_metrics:
                 print("计算F1值(中文分词)...")
                 calculate_f1_chinese(output_file_path) # Modifies file in place
+            if 'f1_cilin' in selected_metrics: # New metric for CILIN F1
+                print("计算F1值(词林扩展)...")
+                cilin_txt_path = "/Users/lpd/Documents/project/ceping/AI_test_utils/test/cilin.txt"
+                if os.path.exists(cilin_txt_path):
+                    calculate_f1_with_cilin(output_file_path, cilin_txt_path) # Modifies file in place
+                else:
+                    print(f"错误：词林文件 {cilin_txt_path} 未找到。跳过F1值(词林扩展)计算。")
+                    try:
+                        temp_df = pd.read_excel(output_file_path)
+                        output_col_name_cilin = 'F1值_词林_层次化'
+                        if output_col_name_cilin not in temp_df.columns:
+                            temp_df[output_col_name_cilin] = pd.Series([None] * len(temp_df), dtype=object)
+                        # Ensure assignment is safe even for empty df
+                        if not temp_df.empty:
+                            temp_df.loc[temp_df.index, output_col_name_cilin] = "词林文件未找到"
+                        else:
+                            temp_df[output_col_name_cilin] = pd.Series(["词林文件未找到"] if not temp_df.empty else [], dtype=object)
+                        temp_df.to_excel(output_file_path, index=False)
+                    except Exception as e_excel:
+                        print(f"写入词林未找到错误到Excel时出错: {e_excel}")
         
         print(f"所有处理和评估完成。最终文件: {output_file_path}")
         return output_file_path

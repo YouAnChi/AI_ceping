@@ -27,11 +27,11 @@ def function1():
     if request.method == 'POST':
         if 'excelFile' not in request.files:
             current_app.logger.error('No file part')
-            return redirect(request.url)
+            return redirect(url_for('main.function1', error_message='没有上传文件'))
         file = request.files['excelFile']
         if file.filename == '':
             current_app.logger.error('No selected file')
-            return redirect(request.url)
+            return redirect(url_for('main.function1', error_message='没有选择文件'))
         if file:
             filename = secure_filename(file.filename)
             uploaded_file_path = os.path.join(current_app.config['UPLOADS_FOLDER'], filename)
@@ -45,7 +45,7 @@ def function1():
             questions_excel_path = extract_column_to_new_excel(uploaded_file_path, column_letter, current_app.config['PROCESSED_FILES_FOLDER'])
             if not questions_excel_path:
                 current_app.logger.error('Failed to extract column from Excel.')
-                return render_template('function1.html', error_message='提取问题列失败')
+                return redirect(url_for('main.function1', error_message='提取问题列失败'))
             current_app.logger.info(f'Questions extracted to {questions_excel_path}')
 
             # 2. 获取表单参数
@@ -83,12 +83,15 @@ def function1():
             if final_excel_path:
                 current_app.logger.info(f'Processing and evaluation complete. Final file: {final_excel_path}')
                 processed_filename = os.path.basename(final_excel_path)
-                return render_template('function1.html', processed_filename=processed_filename)
+                return redirect(url_for('main.function1', processed_filename=processed_filename))
             else:
                 current_app.logger.error('Failed to process and evaluate Excel.')
-                return render_template('function1.html', error_message='处理和评估Excel失败')
+                return redirect(url_for('main.function1', error_message='处理和评估Excel失败'))
 
-    return render_template('function1.html')
+    # GET request handling
+    processed_filename = request.args.get('processed_filename')
+    error_message = request.args.get('error_message')
+    return render_template('function1.html', processed_filename=processed_filename, error_message=error_message)
 
 @main_bp.route('/function2')
 def function2():
