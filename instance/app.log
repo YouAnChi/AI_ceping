@@ -1,6 +1,6 @@
-2025-05-15 15:46:55,945 - app - INFO - External model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'THUDM/GLM-4-32B-0414', 'get_first_token': False}
-2025-05-15 15:46:55,945 - app - INFO - Internal model config: {'key': 'sk-ptaneqxtvnazobcjgrnukaerzqmbjciacwbirtmekesqlrad', 'url': 'https://api.siliconflow.cn/v1/', 'name': 'internlm/internlm2_5-20b-chat', 'get_first_token': False}
-2025-05-15 15:46:55,945 - app - INFO - Selected metrics: ['ass', 'rouge1', 'rouge2', 'rougel', 'f1_chinese', 'f1_cilin']
-2025-05-15 15:48:07,663 - app - INFO - Processing and evaluation complete. Final file: /Users/lpd/Documents/project/ceping/AI_test_utils/instance/processed_files/eval_ready_20250515_154758_bb9d57f9.xlsx
-2025-05-15 15:48:07,674 - app - INFO - Accessed function1 at 2025-05-15 15:48:07.674635 from 127.0.0.1
-2025-05-15 15:48:15,714 - app - INFO - Download request for eval_ready_20250515_154758_bb9d57f9.xlsx at 2025-05-15 15:48:15.714483 from 127.0.0.1
+2025-05-19 16:39:47,780 - app - INFO - Accessed index page at 2025-05-19 16:39:47.780275 from 127.0.0.1
+2025-05-19 16:39:48,305 - app - INFO - Accessed function1 at 2025-05-19 16:39:48.305163 from 127.0.0.1 with method GET
+2025-05-19 16:39:48,306 - app - INFO - Found embedding models: ['BAAI/bge-small-zh-v1.5', 'yangjhchs/acge_text_embedding']
+2025-05-19 16:39:49,833 - app - INFO - Accessed function2 at 2025-05-19 16:39:49.833549 from 127.0.0.1
+2025-05-19 16:39:50,445 - app - INFO - Accessed function1 at 2025-05-19 16:39:50.445820 from 127.0.0.1 with method GET
+2025-05-19 16:39:50,446 - app - INFO - Found embedding models: ['BAAI/bge-small-zh-v1.5', 'yangjhchs/acge_text_embedding']

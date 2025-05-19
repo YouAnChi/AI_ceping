@@ -335,7 +335,7 @@ def calculate_f1_with_cilin(input_excel_path, cilin_path):
 
 def process_and_evaluate_excel(questions_excel_path, output_dir, prompt,
                                external_model_config, internal_model_config,
-                               selected_metrics):
+                               selected_metrics, embedding_model_for_ass='BAAI/bge-small-zh-v1.5'):
     """
     核心处理函数：读取问题Excel，调用内外两个模型，合并结果，执行评估，并保存最终Excel。
 
@@ -419,8 +419,8 @@ def process_and_evaluate_excel(questions_excel_path, output_dir, prompt,
         if selected_metrics:
             print(f"开始评估指标计算: {selected_metrics}")
             if 'ass' in selected_metrics:
-                print("计算ASS值...")
-                excel_ragas(output_file_path) # Modifies file in place
+                print(f"计算ASS值 (使用嵌入模型: {embedding_model_for_ass})...")
+                excel_ragas(output_file_path, embedding_model_identifier=embedding_model_for_ass) # Modifies file in place
             if 'rouge1' in selected_metrics:
                 print("计算ROUGE-1...")
                 excel_rouge(output_file_path, 'ROUGE-1') # Modifies file in place
@@ -471,63 +471,79 @@ def convert_seconds(seconds):
     return hours, minutes, seconds
 
 # Helper function to download/load model
-def get_embedding_model(model_id='yangjhchs/acge_text_embedding', fallback_model='paraphrase-multilingual-MiniLM-L12-v2'):
+def get_embedding_model(model_name_or_path='BAAI/bge-small-zh-v1.5', fallback_model='paraphrase-multilingual-MiniLM-L12-v2'):
     """
-    Ensures the specified sentence embedding model is available locally, downloading it if necessary,
-    and returns the SentenceTransformer model instance.
-    Uses a fallback model if the primary model download or load fails.
+    Ensures the specified sentence embedding model is available, loading from a local path or downloading if necessary.
+    Returns the SentenceTransformer model instance.
+    Uses a fallback model if the primary model load/download fails.
     """
-    # Determine project root dynamically. __file__ is path to achieve.py
-    # os.path.dirname(__file__) is .../AI_test_utils/test
-    # project_root becomes .../AI_test_utils
     project_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    # Define the base directory for models within the project
-    model_base_dir = os.path.join(project_root, 'models') # Target: .../AI_test_utils/models/
+    model_base_dir = os.path.join(project_root, 'models')
     
-    # Construct the specific path for the primary model
-    # ModelScope's snapshot_download for 'org/model_name' typically creates 'cache_dir/org/model_name'
-    # So, if model_id is 'yangjhchs/acge_text_embedding', the path inside model_base_dir will be 'yangjhchs/acge_text_embedding'
-    primary_model_target_path = os.path.join(model_base_dir, model_id)
+    model_to_load = None
+
+    # 1. Check if model_name_or_path is an absolute path to an existing directory
+    if os.path.isabs(model_name_or_path) and os.path.isdir(model_name_or_path):
+        print(f"检测到绝对路径模型: {model_name_or_path}")
+        model_to_load = model_name_or_path
+    else:
+        # 2. Check if model_name_or_path is a relative path within model_base_dir
+        potential_local_path = os.path.join(model_base_dir, model_name_or_path)
+        if os.path.isdir(potential_local_path):
+            print(f"检测到本地模型: {potential_local_path}")
+            model_to_load = potential_local_path
+        else:
+            # 3. Assume it's a ModelScope ID to be downloaded.
+            download_target_path = potential_local_path 
+            print(f"模型 '{model_name_or_path}' 在本地路径 {download_target_path} 未找到或非目录，尝试从 ModelScope 下载...")
+            try:
+                if not os.path.exists(download_target_path) or not os.listdir(download_target_path):
+                    print(f"开始下载 {model_name_or_path} 到 {model_base_dir} (目标子目录: {os.path.basename(download_target_path)})...")
+                    # Ensure the parent directory of the download_target_path exists, 
+                    # especially if model_name_or_path includes subdirectories like 'BAAI/bge-small-zh-v1.5'
+                    os.makedirs(os.path.dirname(download_target_path), exist_ok=True)
+                    
+                    actual_downloaded_path = snapshot_download(model_name_or_path, cache_dir=model_base_dir)
+                    print(f"模型 {model_name_or_path} 已下载到 {actual_downloaded_path}")
+                    
+                    if os.path.exists(download_target_path) and os.listdir(download_target_path):
+                        model_to_load = download_target_path
+                    elif os.path.exists(actual_downloaded_path) and os.listdir(actual_downloaded_path):
+                         print(f"警告: 模型下载路径 {actual_downloaded_path} 与预期目标路径 {download_target_path} 不符，使用实际下载路径。")
+                         model_to_load = actual_downloaded_path
+                    else:
+                        raise FileNotFoundError(f"模型下载后，路径 {download_target_path} (或 {actual_downloaded_path}) 仍然无效或为空。")
+                else:
+                    print(f"本地缓存模型 {download_target_path} 已存在。")
+                    model_to_load = download_target_path
+            except Exception as download_exc:
+                print(f"从 ModelScope 下载或验证模型 {model_name_or_path} 失败: {download_exc}")
+                model_to_load = None
 
     try:
-        # Check if the primary model already exists at the target path and is not empty
-        if not os.path.exists(primary_model_target_path) or not os.listdir(primary_model_target_path):
-            print(f"本地模型 {primary_model_target_path} 不完整或不存在。尝试从 ModelScope 下载...")
-            os.makedirs(model_base_dir, exist_ok=True) # Ensure .../AI_test_utils/models directory exists
-            
-            # Download the model. snapshot_download will place it into a subdirectory structure
-            # within the cache_dir. For example, if cache_dir is 'models' and model_id is 'org/name',
-            # it downloads to 'models/org/name'.
-            downloaded_path = snapshot_download(model_id, cache_dir=model_base_dir)
-            
-            print(f"模型 {model_id} 已下载到 {downloaded_path}")
-            # The downloaded_path should be the same as primary_model_target_path if cache_dir is set correctly.
-            # We verify the final target path.
-            if not os.path.exists(primary_model_target_path) or not os.listdir(primary_model_target_path):
-                 raise FileNotFoundError(f"模型下载后路径 {primary_model_target_path} 仍然无效或为空。")
-            model_to_use = primary_model_target_path
+        if model_to_load and os.path.isdir(model_to_load):
+            print(f"加载 SentenceTransformer 模型: {model_to_load}")
+            return SentenceTransformer(model_to_load)
         else:
-            print(f"本地模型 {primary_model_target_path} 已存在。")
-            model_to_use = primary_model_target_path
-        
-        print(f"加载 SentenceTransformer 模型: {model_to_use}")
-        return SentenceTransformer(model_to_use)
+            if model_to_load:
+                 print(f"错误: 解析后的模型路径 '{model_to_load}' 不是一个有效的目录。")
+            raise ValueError(f"无法确定或加载有效模型路径: '{model_name_or_path}'")
 
     except Exception as e:
-        print(f"处理或加载主模型 {model_id} (尝试路径: {primary_model_target_path}) 失败: {e}")
+        print(f"处理或加载模型 '{model_name_or_path}' (最终尝试路径: {model_to_load if model_to_load else 'N/A'}) 失败: {e}")
         print(f"尝试使用后备模型: {fallback_model}")
-        # For fallback, SentenceTransformer will handle its own caching if it's an HF ID or standard model name
         try:
             return SentenceTransformer(fallback_model)
         except Exception as e_fallback:
             print(f"加载后备模型 {fallback_model} 也失败: {e_fallback}")
             raise  # Re-raise the exception if fallback also fails
 
-def excel_ragas(input_excel_path, model_name):
+def excel_ragas(input_excel_path, embedding_model_identifier='BAAI/bge-small-zh-v1.5'):
     """
     对excel中的B列与C列进行ASS值比较，生成比较值，并写入excel中。
 
     :param input_excel_path: 输入的Excel文件路径
+    :param embedding_model_identifier: 用于ASS评估的嵌入模型的名称、ModelScope ID或本地路径
     """
 
     # 读取Excel文件
@@ -551,8 +567,10 @@ def excel_ragas(input_excel_path, model_name):
         questions_two = questions_two[:min_len]
 
     # 准备结果列
-    if f'ASS值{model_name}' not in df.columns:
-        df[f'ASS值{model_name}'] = pd.Series(dtype='float64') # Ensure float type for scores
+    # 使用 embedding_model_identifier 来创建列名，以反映所使用的模型
+    ass_column_name = f'ASS ({embedding_model_identifier})'
+    if ass_column_name not in df.columns:
+        df[ass_column_name] = pd.Series(dtype='float64') # Ensure float type for scores
 
     questions_len = len(questions_one)
     if questions_len == 0:
@@ -560,9 +578,9 @@ def excel_ragas(input_excel_path, model_name):
         return
     
     # 批量数据进行ASS对比
-    print('获取嵌入模型...')
+    print(f'获取嵌入模型 ({embedding_model_identifier})...')
     try:
-        model = get_embedding_model(model_id=model_name)
+        model = get_embedding_model(embedding_model_identifier)
     except Exception as e:
         print(f"无法加载ASS评估所需的嵌入模型: {e}。ASS评估无法进行。")
         return
@@ -595,7 +613,7 @@ def excel_ragas(input_excel_path, model_name):
 
     # 将完整响应写入DataFrame
     # Ensure the series is aligned with the original DataFrame's index for the relevant rows
-    df.loc[df.iloc[:,1].dropna().index[:questions_len], f'ASS值{model_name}'] = ass_scores
+    df.loc[df.iloc[:,1].dropna().index[:questions_len], ass_column_name] = ass_scores
 
     # 计算耗时
     end_time = time.time()
@@ -698,6 +716,7 @@ def calculate_f1_chinese(input_excel_path):
     计算两段中文文本之间的F1值，使用jieba进行分词。
 
     :param input_excel_path: 输入的Excel文件路径
+    :param embedding_model_identifier: 用于ASS评估的嵌入模型的名称、ModelScope ID或本地路径
     """
     # 读取Excel文件
     df = pd.read_excel(input_excel_path)
