@@ -4,3 +4,6 @@
 2025-05-19 16:39:49,833 - app - INFO - Accessed function2 at 2025-05-19 16:39:49.833549 from 127.0.0.1
 2025-05-19 16:39:50,445 - app - INFO - Accessed function1 at 2025-05-19 16:39:50.445820 from 127.0.0.1 with method GET
 2025-05-19 16:39:50,446 - app - INFO - Found embedding models: ['BAAI/bge-small-zh-v1.5', 'yangjhchs/acge_text_embedding']
+2025-05-20 18:00:28,787 - app - INFO - Accessed index page at 2025-05-20 18:00:28.787247 from 127.0.0.1
+2025-05-20 18:00:36,577 - app - INFO - Accessed function1 at 2025-05-20 18:00:36.577550 from 127.0.0.1 with method GET
+2025-05-20 18:00:36,579 - app - INFO - Found embedding models: ['BAAI/bge-small-zh-v1.5', 'yangjhchs/acge_text_embedding']

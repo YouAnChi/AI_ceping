@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>多指标AI智能分析系统 - 成研院-技支-大模型辅助通用系统</title>
+    <title>生成式文本准确性指标测评工具 - 成研院-技支-大模型辅助通用系统</title>
 
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/carousel.css') }}" rel="stylesheet">
@@ -258,7 +258,7 @@
             <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">多指标AI智能分析系统</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">生成式文本准确性指标测评工具</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.function2') }}">文件下载</a>
@@ -272,7 +272,7 @@
 <main>
     <div class="container mt-5 pt-5">
         <div class="page-header animate-fade-in">
-            <h1>多指标AI智能分析系统</h1>
+            <h1>生成式文本准确性指标测评工具</h1>
             <p class="page-description">上传您的Excel文件，配置模型参数，选择评估指标，我们将为您提供全面的模型评估结果。</p>
         </div>
         
@@ -375,7 +375,7 @@
                             </div>
                             <!-- Dropdown for ASS embedding model selection -->
                             <div class="mt-2" id="assEmbeddingModelGroup" style="display: none;">
-                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入模型:</label>
+                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入文本向量化模型选择:</label>
                                 <select class="form-select form-select-sm" id="embeddingModelForASS" name="embedding_model_for_ass">
                                     {% if embedding_models %}
                                         {% for model_name in embedding_models %}
@@ -397,7 +397,7 @@
                             </div>
                             <!-- Dropdown for ASS embedding model selection -->
                             <div class="mt-2" id="assEmbeddingModelGroup" style="display: none;">
-                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入模型:</label>
+                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入文本向量化模型选择:</label>
                                 <select class="form-select form-select-sm" id="embeddingModelForASS" name="embedding_model_for_ass">
                                     {% if embedding_models %}
                                         {% for model_name in embedding_models %}
@@ -419,7 +419,7 @@
                             </div>
                             <!-- Dropdown for ASS embedding model selection -->
                             <div class="mt-2" id="assEmbeddingModelGroup" style="display: none;">
-                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入模型:</label>
+                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入文本向量化模型选择:</label>
                                 <select class="form-select form-select-sm" id="embeddingModelForASS" name="embedding_model_for_ass">
                                     {% if embedding_models %}
                                         {% for model_name in embedding_models %}
@@ -441,7 +441,7 @@
                             </div>
                             <!-- Dropdown for ASS embedding model selection -->
                             <div class="mt-2" id="assEmbeddingModelGroup" style="display: none;">
-                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入模型:</label>
+                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入文本向量化模型选择:</label>
                                 <select class="form-select form-select-sm" id="embeddingModelForASS" name="embedding_model_for_ass">
                                     {% if embedding_models %}
                                         {% for model_name in embedding_models %}
@@ -463,7 +463,7 @@
                             </div>
                             <!-- Dropdown for ASS embedding model selection -->
                             <div class="mt-2" id="assEmbeddingModelGroup" style="display: none;">
-                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入模型:</label>
+                                <label for="embeddingModelForASS" class="form-label">ASS评估嵌入文本向量化模型选择:</label>
                                 <select class="form-select form-select-sm" id="embeddingModelForASS" name="embedding_model_for_ass">
                                     {% if embedding_models %}
                                         {% for model_name in embedding_models %}
