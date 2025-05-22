@@ -263,6 +263,12 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.function2') }}">文件下载</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.function3') }}">文本内容随机抽取工具</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.function4') }}">AI模型评估工具</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -546,7 +552,7 @@
             }
 
             try {
-                const response = await fetch('{{ url_for("main.test_connection") }}', {
+                const response = await fetch('{{ url_for("main.test_ai_model_connection") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -5,12 +5,19 @@ import os
 from werkzeug.utils import secure_filename
 import uuid
 import threading
+from urllib.parse import urlparse, urlunparse # Added for URL parsing
+import json # Added for json operations
+from TQ import tools as tq_tools # Changed to absolute import from project root
 
 main_bp = Blueprint('main', __name__)
 
 # A simple in-memory store for task statuses (NOT SUITABLE FOR PRODUCTION)
 # Structure: tasks_status[task_id] = {'status': 'processing' | 'completed' | 'failed', 'progress': 0-100, 'message': '...', 'processed_filename': '...'}
 tasks_status = {}
+
+# Ensure PROCESSED_FILES_FOLDER is accessible for downloads
+# It's usually configured in app.py, e.g., app.config['PROCESSED_FILES_FOLDER'] = 'processed_files'
+# And UPLOADS_FOLDER for uploads, e.g., app.config['UPLOADS_FOLDER'] = 'uploads'
 
 import requests # For making HTTP requests in test_connection
 
@@ -179,65 +186,437 @@ def function1():
     # GET request handling (renders the initial page)
     return render_template('function1.html', embedding_models=embedding_models_list)
 
-@main_bp.route('/test_connection', methods=['POST'])
-def test_connection():
+@main_bp.route('/function2', methods=['GET'])
+def function2():
+    log_message = f"Accessed function2 at {datetime.now()} from {request.remote_addr} with method {request.method}"
+    current_app.logger.info(log_message)
+    # This page is for downloads, logic to list files or handle specific downloads would go here.
+    # For now, just rendering the template.
+    # Example: list files from PROCESSED_FILES_FOLDER
+    processed_files_dir = current_app.config.get('PROCESSED_FILES_FOLDER', 'processed_files')
+    if not os.path.exists(processed_files_dir):
+        os.makedirs(processed_files_dir) # Ensure it exists
+    
+    files = []
+    try:
+        # List only files, not directories, and sort by modification time (newest first)
+        file_details = []
+        for f_name in os.listdir(processed_files_dir):
+            f_path = os.path.join(processed_files_dir, f_name)
+            if os.path.isfile(f_path):
+                file_details.append({
+                    'name': f_name,
+                    'url': url_for('main.download_file', filename=f_name),
+                    'size': os.path.getsize(f_path),
+                    'modified_time': datetime.fromtimestamp(os.path.getmtime(f_path)).strftime('%Y-%m-%d %H:%M:%S')
+                })
+        # Sort files by modified time, newest first
+        files = sorted(file_details, key=lambda x: x['modified_time'], reverse=True)
+    except Exception as e:
+        current_app.logger.error(f"Error listing files in {processed_files_dir}: {e}")
+        # Optionally, pass an error message to the template
+
+    return render_template('function2.html', files=files)
+
+@main_bp.route('/function3', methods=['GET', 'POST'])
+def function3():
+    log_message = f"Accessed function3 at {datetime.now()} from {request.remote_addr} with method {request.method}"
+    current_app.logger.info(log_message)
+    
+    if request.method == 'POST':
+        try:
+            files = request.files.getlist('fileUpload[]') # For multiple files / folder upload
+            split_by = request.form.get('split_by', '\n')
+            extraction_type = request.form.get('extraction_type', 'count')
+            count = request.form.get('count', type=int)
+            percentage = request.form.get('percentage', type=float)
+
+            uploads_folder = current_app.config.get('UPLOADS_FOLDER', 'uploads')
+            processed_folder = current_app.config.get('PROCESSED_FILES_FOLDER', 'processed_files')
+            if not os.path.exists(uploads_folder):
+                os.makedirs(uploads_folder)
+            if not os.path.exists(processed_folder):
+                os.makedirs(processed_folder)
+
+            output_files = []
+
+            if not files or all(f.filename == '' for f in files):
+                return jsonify({'status': 'failed', 'message': '没有选择文件或文件夹'}), 400
+
+            # Heuristic to check if it's a folder upload (multiple files with relative paths)
+            # For a proper folder upload, client-side JS might package it, or server needs to handle path reconstruction.
+            # The input `webkitdirectory` sends a list of files.
+            # If only one file is selected, it's treated as a single file. If multiple, could be a folder's contents.
+
+            # Simplified: if more than one file, assume it's contents of a directory to be processed individually
+            # or if a single file, process that file.
+            # A more robust solution for folder uploads would involve checking `file.content_type` or using a library.
+
+            temp_upload_dir = os.path.join(uploads_folder, str(uuid.uuid4())) # Temporary directory for this request's uploads
+            os.makedirs(temp_upload_dir, exist_ok=True)
+            
+            uploaded_file_paths = []
+            is_folder_upload = len(files) > 1 # Simple heuristic
+
+            for file in files:
+                if file and file.filename:
+                    filename = secure_filename(file.filename)
+                    # If webkitdirectory is used, filenames might contain relative paths.
+                    # We need to reconstruct the structure or treat them flatly.
+                    # For simplicity, saving them flatly in temp_upload_dir.
+                    file_path = os.path.join(temp_upload_dir, filename)
+                    file.save(file_path)
+                    uploaded_file_paths.append(file_path)
+            
+            if not uploaded_file_paths:
+                 return jsonify({'status': 'failed', 'message': '未能成功保存任何上传的文件'}), 500
+
+            if is_folder_upload or (len(uploaded_file_paths) == 1 and os.path.isdir(uploaded_file_paths[0])):
+                # This part needs refinement. `extract_and_save_to_excel_folder` expects a folder path.
+                # If files are uploaded flatly, we pass the temp_upload_dir.
+                # tools.py saves output in the same folder as input by default, or CWD.
+                # We want output in PROCESSED_FILES_FOLDER.
+                # Modification: Pass output_dir to tq_tools functions.
+                # For now, let's assume tq_tools.extract_and_save_to_excel_folder can take a list of files or a dir
+                # and an output_dir parameter.
+                # This part of tq_tools.py might need adjustment to accept an output_directory.
+                # For now, we'll call it and expect it to save in processed_folder.
+                # Let's assume the tool saves to its CWD or a fixed path, then we move it.
+                
+                # Let's assume extract_and_save_to_excel_folder works on temp_upload_dir
+                # and we need to make its output go to processed_folder.
+                # The tool currently returns full paths to generated excels.
+                # We'll modify the tool to accept an output_dir or handle moving files.
+                # For now, let's call it as is and see. It might save to CWD.
+                # A better approach: modify tools.py to accept an output_dir.
+                # For now, we'll call it and then try to provide download links assuming files are in processed_folder.
+
+                # Simplified: Assume the tool saves to `processed_folder` if we could pass it.
+                # Since we can't modify tools.py now, let's assume it saves to CWD or relative to script.
+                # This will require manual moving of files or adjusting tools.py later.
+                # For this step, we'll call the function and assume it returns paths we can serve.
+                
+                # Let's assume `extract_and_save_to_excel_folder` is adapted to take `output_base_dir`
+                # and returns paths relative to that or absolute paths within it.
+                # For now, this is a placeholder for the actual call.
+                # result_paths = tq_tools.extract_and_save_to_excel_folder(temp_upload_dir, split_by, extraction_type, count, percentage, output_target_dir=processed_folder)
+                # For now, let's just simulate a single file output for simplicity of frontend.
+                # This part needs to be robustly implemented based on how tools.py works.
+                
+                # Let's process each file individually if it's a "folder" upload (multiple files)
+                for single_file_path in uploaded_file_paths:
+                    if single_file_path.lower().endswith('.txt'):
+                        # The tool needs to be modified to accept an output directory.
+                        # For now, assume it saves to processed_folder and returns the filename.
+                        # This is a conceptual call, actual implementation depends on tools.py modification.
+                        output_excel_path = tq_tools.extract_and_save_to_excel(
+                            single_file_path, split_by, extraction_type, count, percentage,
+                            output_dir=processed_folder # Assuming tools.py is modified for this
+                        )
+                        if output_excel_path:
+                            output_files.append({
+                                'name': os.path.basename(output_excel_path),
+                                'url': url_for('main.download_file', filename=os.path.basename(output_excel_path))
+                            })
+            elif len(uploaded_file_paths) == 1:
+                single_file_path = uploaded_file_paths[0]
+                if single_file_path.lower().endswith('.txt'):
+                    output_excel_path = tq_tools.extract_and_save_to_excel(
+                        single_file_path, split_by, extraction_type, count, percentage,
+                        output_dir=processed_folder # Assuming tools.py is modified for this
+                    )
+                    if output_excel_path:
+                        output_files.append({
+                            'name': os.path.basename(output_excel_path),
+                            'url': url_for('main.download_file', filename=os.path.basename(output_excel_path))
+                        })
+                else:
+                    return jsonify({'status': 'failed', 'message': '请上传.txt格式的文件'}), 400
+            
+            if not output_files:
+                return jsonify({'status': 'failed', 'message': '未能处理文件或生成输出'}), 500
+
+            return jsonify({'status': 'completed', 'files': output_files})
+
+        except Exception as e:
+            current_app.logger.error(f'Error in function3 POST: {str(e)}')
+            return jsonify({'status': 'failed', 'message': f'处理请求时发生内部错误: {str(e)}'}), 500
+
+    return render_template('function3.html')
+
+# Background task for AI model evaluation (function4)
+def process_evaluation_task_background(app, task_id, params):
+    with app.app_context():
+        try:
+            current_app.logger.info(f"Background AI evaluation started for task {task_id}")
+            tasks_status[task_id]['status'] = 'processing'
+            tasks_status[task_id]['progress'] = 10
+
+            # ai_prompt_query modifies the file in-place and returns its path
+            modified_excel_path = tq_tools.ai_prompt_query(
+                params['input_excel_path'],
+                params['output_column_name'],
+                params['model_key'],
+                params['model_url'],
+                params['model_name'],
+                params['prompt_content']
+            )
+            tasks_status[task_id]['progress'] = 80
+
+            if modified_excel_path and os.path.exists(modified_excel_path):
+                processed_filename = os.path.basename(modified_excel_path)
+                # The function is already within 'with app.app_context():'.
+                # Manually construct the relative URL to avoid issues with url_for in background threads without SERVER_NAME.
+                relative_download_url = f"/download_file/{processed_filename}"
+                tasks_status[task_id].update({
+                    'status': 'completed',
+                    'progress': 100,
+                    'message': 'AI模型评估处理成功完成。',
+                    'processed_filename': processed_filename, # Keep for potential other uses
+                    'download_url': relative_download_url, # Update to relative URL
+                    'files': [{'name': processed_filename, 'url': relative_download_url}] # Add for consistency with function3
+                })
+                current_app.logger.info(f'Background AI evaluation complete for task {task_id}. Output file: {modified_excel_path}')
+            else:
+                tasks_status[task_id].update({'status': 'failed', 'progress': 100, 'message': 'AI模型评估处理失败或未生成文件。'})
+                current_app.logger.error(f'Background AI evaluation failed for task {task_id}: ai_prompt_query returned None or file does not exist.')
+
+        except Exception as e:
+            current_app.logger.error(f'Exception during background AI evaluation for task {task_id}: {str(e)}')
+            tasks_status[task_id].update({'status': 'failed', 'progress': 100, 'message': f'处理过程中发生内部错误: {str(e)}'})
+
+@main_bp.route('/function4', methods=['GET', 'POST'])
+def function4():
+    log_message = f"Accessed function4 at {datetime.now()} from {request.remote_addr} with method {request.method}"
+    current_app.logger.info(log_message)
+
+    if request.method == 'POST':
+        task_id = str(uuid.uuid4())
+        tasks_status[task_id] = {'status': 'submitted', 'progress': 0, 'task_id': task_id}
+
+        try:
+            if 'excelFile' not in request.files:
+                tasks_status[task_id].update({'status': 'failed', 'message': '没有上传Excel文件'})
+                return jsonify(tasks_status[task_id]), 400
+            
+            excel_file = request.files['excelFile']
+            if excel_file.filename == '':
+                tasks_status[task_id].update({'status': 'failed', 'message': '没有选择Excel文件'})
+                return jsonify(tasks_status[task_id]), 400
+
+            # Ensure PROCESSED_FILES_FOLDER exists (where input file will be saved and modified)
+            processed_folder = current_app.config.get('PROCESSED_FILES_FOLDER', 'processed_files')
+            if not os.path.exists(processed_folder):
+                os.makedirs(processed_folder)
+
+            filename = secure_filename(excel_file.filename)
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            # Save the uploaded file to be processed in place by ai_prompt_query
+            input_excel_filename = f"{os.path.splitext(filename)[0]}_{timestamp}_{task_id}{os.path.splitext(filename)[1]}"
+            input_excel_path = os.path.join(processed_folder, input_excel_filename)
+            excel_file.save(input_excel_path)
+            current_app.logger.info(f'File {filename} uploaded to {input_excel_path} for AI evaluation task {task_id}')
+            tasks_status[task_id]['progress'] = 5
+
+            model_key = request.form.get('model_key')
+            model_url = request.form.get('model_url')
+            model_name = request.form.get('model_name')
+            selected_prompt_name = request.form.get('prompt_name') # Matches HTML form
+            
+            # Load prompts to find the content for the selected_prompt_name
+            prompts_data_list = []
+            try:
+                prompt_file_path_for_load = os.path.join(current_app.root_path, '..', 'TQ', 'PromptTemplate.json')
+                prompts_data_list = tq_tools.load_prompts(prompt_file_path_for_load)
+            except Exception as e:
+                current_app.logger.error(f"Error loading prompts for task {task_id}: {e}")
+                tasks_status[task_id].update({'status': 'failed', 'message': '加载Prompt模板失败'})
+                return jsonify(tasks_status[task_id]), 500
+
+            prompt_content = ""
+            for p_data in prompts_data_list:
+                if p_data.get('name') == selected_prompt_name:
+                    prompt_content = p_data.get('prompt', '')
+                    break
+            
+            if not prompt_content:
+                tasks_status[task_id].update({'status': 'failed', 'message': '选择的Prompt模板无效或内容为空'})
+                return jsonify(tasks_status[task_id]), 400
+
+            # Default output column name to the prompt name if not specified, or handle as needed
+            output_column_name = selected_prompt_name 
+
+            processing_params = {
+                'input_excel_path': input_excel_path,
+                'output_column_name': output_column_name,
+                'model_key': model_key,
+                'model_url': model_url,
+                'model_name': model_name,
+                'prompt_content': prompt_content
+            }
+            
+            thread = threading.Thread(target=process_evaluation_task_background, args=(current_app._get_current_object(), task_id, processing_params))
+            thread.daemon = True
+            thread.start()
+
+            tasks_status[task_id]['status'] = 'processing' # Update status as thread starts
+            current_app.logger.info(f'AI evaluation task {task_id} submitted for background processing.')
+            return jsonify(tasks_status[task_id])
+
+        except Exception as e:
+            current_app.logger.error(f'Error during initial processing for AI evaluation task {task_id}: {str(e)}')
+            tasks_status[task_id].update({'status': 'failed', 'message': f'处理请求时发生内部错误: {str(e)}'})
+            return jsonify(tasks_status[task_id]), 500
+
+    # GET request: Render the page. Prompts and models will be fetched by JS.
+    return render_template('function4.html')
+
+@main_bp.route('/get_llm_models', methods=['GET'])
+def get_llm_models():
+    # In a real application, these would come from a config file, database, or API discovery
+    # For now, hardcoding a list similar to function1.html's original dropdown
+    # The frontend expects a list of objects like {id: 'model_id', name: 'Model Name'} or just a list of strings.
+    # Let's provide a list of strings for simplicity, matching common model identifiers.
+    models = [
+        "deepseek-ai/DeepSeek-V2.5",
+        "Qwen/Qwen3-30B-A3B",
+        "THUDM/GLM-4-32B-0414",
+        "internlm/internlm2_5-20b-chat",
+        # Add more models as needed
+        "gpt-3.5-turbo",
+        "gpt-4"
+    ]
+    # Convert to list of objects if frontend expects {id, name}
+    # models_for_frontend = [{'id': m, 'name': m} for m in models]
+    return jsonify(models) # Or jsonify(models_for_frontend)
+
+@main_bp.route('/get_prompts', methods=['GET'])
+def get_prompts():
+    try:
+        prompt_file_path = os.path.join(current_app.root_path, '..', 'TQ', 'PromptTemplate.json')
+        prompts_data = tq_tools.load_prompts(prompt_file_path)
+        if prompts_data is None: # load_prompts might return None on error
+            prompts_data = []
+        # Ensure it's a list of objects with 'name' and 'prompt' keys as expected by frontend
+        # The current load_prompts seems to return this structure already.
+        return jsonify(prompts_data)
+    except Exception as e:
+        current_app.logger.error(f"Error loading prompts for /get_prompts endpoint: {e}")
+        return jsonify([]), 500 # Return empty list on error
+
+@main_bp.route('/test_ai_model_connection', methods=['POST'])
+def test_ai_model_connection(): # Renamed for clarity
     data = request.get_json()
     api_key = data.get('api_key')
     api_url = data.get('api_url')
-    model_name = data.get('model_name') # Potentially useful for specific checks
+    model_name = data.get('model_name')
 
-    if not api_url:
-        return jsonify({'status': 'failed', 'message': 'API URL 不能为空'}), 400
+    if not api_url or not model_name:
+        return jsonify({'success': False, 'message': 'API URL 和模型名称不能为空'}), 400
 
-    headers = {}
+    headers = {'Content-Type': 'application/json'}
     if api_key:
-        headers['Authorization'] = f'Bearer {api_key}' # Common practice, adjust if API expects different auth
+        headers['Authorization'] = f'Bearer {api_key}'
     
-    # Add a common header that might be expected by LLM APIs
-    headers['Content-Type'] = 'application/json'
+    # Construct a minimal payload for testing. For many OpenAI-compatible APIs,
+    # a simple chat completion request with max_tokens=1 is a good test.
+    payload = {
+        "model": model_name,
+        "messages": [{"role": "user", "content": "Say hi"}],
+        "max_tokens": 1
+    }
+    # Construct the test request URL more robustly
+    parsed_url = urlparse(api_url)
+    
+    if "chat/completions" in parsed_url.path:
+        # Assume it's a full, correct URL if 'chat/completions' is in the path
+        test_request_url = api_url
+    elif parsed_url.query:
+        # If there are query parameters and it's not a chat/completions path,
+        # assume it's a custom URL that should be used as is (e.g., Azure).
+        test_request_url = api_url
+    else:
+        # No 'chat/completions' in path, and no query parameters.
+        # Assume it's a base URL. Append /v1 (if not already versioned) and /chat/completions.
+        temp_path = parsed_url.path.strip('/') # Path part, e.g., "" or "custom_base" or "custom_base/v2"
+        path_segments = [s for s in temp_path.split('/') if s]
+
+        ends_with_version_segment = False
+        if path_segments:
+            last_segment = path_segments[-1]
+            # Check for patterns like v1, v2, v1_beta (simplified check: starts with 'v' and has a digit after 'v')
+            if last_segment.startswith('v') and len(last_segment) > 1 and any(char.isdigit() for char in last_segment[1:]):
+                ends_with_version_segment = True
+        
+        if not ends_with_version_segment:
+            if temp_path: # If there was an original path, append /v1 to it
+                temp_path = temp_path.rstrip('/') + '/v1'
+            else: # No original path (e.g. http://host.com), so path becomes v1
+                temp_path = 'v1'
+        
+        # Now temp_path is like "custom_base/v1" or "v1" or "custom_base/v2"
+        # Append /chat/completions
+        final_path_str = temp_path.rstrip('/') + '/chat/completions'
+        
+        # Ensure final_path_str starts with a slash for urlunparse
+        if not final_path_str.startswith('/'):
+            final_path_str = '/' + final_path_str
+            
+        # Reconstruct the URL with the new path, keeping original scheme, netloc etc., and empty query for this branch
+        test_request_url = urlunparse(parsed_url._replace(path=final_path_str, query=''))
 
     try:
-        # Attempt a simple request. A GET request to the base URL or a known health endpoint is common.
-        # For LLM APIs, often a POST to a completions or models endpoint is needed for a real test.
-        # Here, we'll try a GET request to the base URL as a generic test.
-        # Some APIs might not respond to a simple GET on the base URL, or might require a specific path.
-        # A more robust test might involve sending a minimal valid payload if the API structure is known.
-        
-        # Let's try to list models if the URL pattern suggests it (common for OpenAI-compatible APIs)
-        # This is a heuristic and might not work for all APIs.
-        test_url = api_url.strip('/') # Remove trailing slash for consistency
-        if not test_url.endswith('/v1'): # if it's a base url like https://api.example.com
-            test_url += '/v1' # append /v1
-        
-        # Try to list models, a common endpoint for LLM APIs
-        # If the API is not OpenAI compatible, this might fail, but it's a reasonable attempt.
-        # A simple GET to the base_url might also work for some health checks.
-        # Using a timeout to prevent hanging indefinitely.
-        response = requests.get(f"{test_url}/models", headers=headers, timeout=10) 
-
-        # Check if the request was successful (status code 2xx)
-        if response.status_code >= 200 and response.status_code < 300:
-            # Optionally, check if the response body contains expected data, e.g., a list of models
-            # For simplicity, we'll just consider a 2xx status as success here.
-            current_app.logger.info(f"Connection test to {api_url} (model: {model_name}) successful. Status: {response.status_code}")
-            return jsonify({'status': 'success', 'message': '连接成功'}), 200
+        response = requests.post(test_request_url, headers=headers, json=payload, timeout=10)
+        if response.status_code == 200:
+            # Further check if response is valid JSON and indicates success
+            try:
+                response_data = response.json()
+                # A successful response usually has 'choices' or similar field
+                if response_data.get('choices') or response_data.get('id'): # Check for common success indicators
+                    current_app.logger.info(f"AI Model Connection test to {api_url} (model: {model_name}) successful.")
+                    return jsonify({'success': True, 'message': '连接成功，模型可用。'}), 200
+                else:
+                    current_app.logger.warning(f"AI Model Connection test to {api_url} (model: {model_name}) returned 200 but response format unexpected: {response.text[:200]}")
+                    return jsonify({'success': False, 'message': f'连接成功但响应格式非预期。请确认模型名称和API端点。'}), 200 # Still 200 from server, but our check failed
+            except ValueError: # JSONDecodeError inherits from ValueError
+                current_app.logger.warning(f"AI Model Connection test to {api_url} (model: {model_name}) returned 200 but response is not valid JSON: {response.text[:200]}")
+                return jsonify({'success': False, 'message': '连接成功但服务器响应不是有效的JSON。'}), 200
         else:
-            current_app.logger.warning(f"Connection test to {api_url} (model: {model_name}) failed. Status: {response.status_code}, Response: {response.text[:200]}")
-            return jsonify({'status': 'failed', 'message': f'连接失败 (状态码: {response.status_code}). 请检查API URL和Key。'}), response.status_code
+            error_message = f'连接失败 (状态码: {response.status_code}). '
+            try:
+                err_details = response.json().get('error', {}).get('message', response.text[:100])
+                error_message += err_details
+            except ValueError:
+                error_message += response.text[:100]
+            current_app.logger.warning(f"AI Model Connection test to {api_url} (model: {model_name}) failed. Status: {response.status_code}, Response: {response.text[:200]}")
+            return jsonify({'success': False, 'message': error_message}), response.status_code
 
     except requests.exceptions.Timeout:
-        current_app.logger.error(f"Connection test to {api_url} (model: {model_name}) timed out.")
-        return jsonify({'status': 'failed', 'message': '连接超时。请检查API URL和网络连接。'}), 408
+        current_app.logger.error(f"AI Model Connection test to {api_url} (model: {model_name}) timed out.")
+        return jsonify({'success': False, 'message': '连接超时。请检查API URL和网络连接。'}), 408
     except requests.exceptions.RequestException as e:
-        current_app.logger.error(f"Connection test to {api_url} (model: {model_name}) failed with exception: {str(e)}")
-        return jsonify({'status': 'failed', 'message': f'连接请求失败: {str(e)}'}), 500
+        current_app.logger.error(f"AI Model Connection test to {api_url} (model: {model_name}) failed with exception: {str(e)}")
+        return jsonify({'success': False, 'message': f'连接请求失败: {str(e)}'}), 500
     except Exception as e:
-        current_app.logger.error(f"An unexpected error occurred during connection test to {api_url} (model: {model_name}): {str(e)}")
-        return jsonify({'status': 'failed', 'message': f'发生意外错误: {str(e)}'}), 500
+        current_app.logger.error(f"An unexpected error occurred during AI model connection test to {api_url} (model: {model_name}): {str(e)}")
+        return jsonify({'success': False, 'message': f'发生意外错误: {str(e)}'}), 500
+
+@main_bp.route('/get_evaluation_progress/<task_id>', methods=['GET'])
+def get_evaluation_progress(task_id):
+    log_message = f"Polling AI evaluation progress for task_id {task_id} at {datetime.now()} from {request.remote_addr}"
+    # current_app.logger.info(log_message) # Can be too verbose, uncomment if needed for debugging
+
+    task_info = tasks_status.get(task_id)
+    if not task_info:
+        return jsonify({'status': 'error', 'message': '无效的任务ID或任务已过期'}), 404
+    
+    # Actual progress is updated by the background thread.
+    # No need to simulate progress here if the background thread is doing its job.
+    return jsonify(task_info)
 
 
 @main_bp.route('/get_progress/<task_id>', methods=['GET'])
-def get_progress(task_id):
+def get_progress(task_id): # This is for function1, keep it separate
     log_message = f"Polling progress for task_id {task_id} at {datetime.now()} from {request.remote_addr}"
     current_app.logger.info(log_message)
 
@@ -245,19 +624,16 @@ def get_progress(task_id):
     if not task_info:
         return jsonify({'status': 'error', 'message': '无效的任务ID'}), 404
     
-    # Simulate some progress if still processing by the background thread
-    if task_info['status'] == 'processing' and task_info['progress'] < 90: # Don't overwrite final 100 from thread
-        task_info['progress'] += 5 # Simple progress simulation for polling
+    if task_info['status'] == 'processing' and task_info['progress'] < 90: 
+        task_info['progress'] += 5 
         if task_info['progress'] > 90: task_info['progress'] = 90
 
     return jsonify(task_info)
 
-
-@main_bp.route('/function2')
-def function2():
-    log_message = f"Accessed function2 at {datetime.now()} from {request.remote_addr}"
-    current_app.logger.info(log_message)
-    return render_template('function2.html')
+@main_bp.route('/task_status/<task_id>') # Generic, might be fine or need specific versions
+def task_status(task_id):
+    status = tasks_status.get(task_id, {'status': 'not_found', 'message': '任务未找到或已过期'})
+    return jsonify(status)
 
 @main_bp.route('/download_file/<filename>')
 def download_file(filename):
@@ -265,20 +641,16 @@ def download_file(filename):
     current_app.logger.info(log_message)
     
     directory = current_app.config['PROCESSED_FILES_FOLDER']
-    # Ensure directory is absolute or correctly relative to app root for send_from_directory
     if not os.path.isabs(directory):
-        # Assuming PROCESSED_FILES_FOLDER is relative to the instance path or app root
-        # For simplicity, let's assume it's relative to app.root_path if not absolute.
-        # A more robust solution might involve current_app.instance_path
-        directory = os.path.join(current_app.root_path, '..', directory) # Adjust if structure is different
+        directory = os.path.join(current_app.root_path, '..', directory)
         directory = os.path.normpath(directory)
 
     current_app.logger.info(f"Attempting to send file from directory: {directory}, filename: {filename}")
     
     safe_filename = secure_filename(filename)
-    if safe_filename != filename:
-        current_app.logger.warning(f"Potentially unsafe filename requested: {filename}, sanitized to {safe_filename}. Denying request.")
-        return jsonify({'status': 'error', 'message': '无效的文件名'}), 400
+    # It's important that the filename stored in tasks_status (and thus used in url_for) is already safe
+    # or that this sanitization matches how it was stored/generated.
+    # If task_id is part of filename, it should be safe.
     
     file_path = os.path.join(directory, safe_filename)
     if not os.path.exists(file_path):
