@@ -260,14 +260,12 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{{ url_for('main.function1') }}">生成式文本准确性指标测评工具</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('main.function2') }}">文件下载</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.function3') }}">文本内容随机抽取工具</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('main.function4') }}">AI模型评估工具</a>
+            <a class="nav-link" href="{{ url_for('main.function4') }}">AI评AI工具</a>
           </li>
         </ul>
       </div>
@@ -527,10 +525,6 @@
         {% endif %}
     </div>
 <!-- FOOTER -->
-  <footer class="container" style="color: white;">
-    <p class="float-end"><a href="#" style="color: #f8f9fa;">Back to top</a></p>
-    <p>&copy; 2017–2021 Company, Inc. &middot; <a href="#" style="color: #f8f9fa;">Privacy</a> &middot; <a href="#" style="color: #f8f9fa;">Terms</a></p>
-  </footer>
 </main>
 
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
@@ -543,7 +537,7 @@
             const statusElement = document.getElementById(`${modelType}_model_status`);
 
             statusElement.textContent = '正在测试...';
-            statusElement.className = 'ms-2'; // Reset class
+            statusElement.className = 'ms-2 text-info'; // Reset class
 
             if (!apiUrl) {
                 statusElement.textContent = 'API URL 不能为空';
@@ -567,12 +561,17 @@
 
                 const result = await response.json();
 
-                if (response.ok && result.status === 'success') {
-                    statusElement.textContent = '连接成功!';
-                    statusElement.classList.add('text-success');
+                if (response.ok && result.success) { // Check result.success (boolean) instead of result.status === 'success'
+                    statusElement.textContent = '连接成功，模型可用。';
+                    statusElement.className = 'ms-2 text-success'; // Ensure only success class is applied
                 } else {
-                    statusElement.textContent = `连接失败: ${result.message || '未知错误'}`;
-                    statusElement.classList.add('text-danger');
+                    let failMsg = '连接失败';
+                    // Use result.message from the backend for failure details
+                    if (result.message && result.message.trim() !== '') {
+                        failMsg += ': ' + result.message;
+                    }
+                    statusElement.textContent = failMsg;
+                    statusElement.className = 'ms-2 text-danger'; // Ensure only danger class is applied
                 }
             } catch (error) {
                 console.error('Error testing connection:', error);
@@ -808,6 +807,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-      
+
+<footer class="container text-center mt-5" style="color: var(--secondary-color);">
+    <p>&copy; 2025 成研院-技支. 保留所有权利.</p>
+</footer>     
   </body>
 </html>

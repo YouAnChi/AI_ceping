@@ -190,14 +190,12 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.function1') }}">生成式文本准确性指标测评工具</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('main.function2') }}">文件下载</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('main.function3') }}">文本内容随机抽取工具</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function4') }}">AI模型评估工具</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('main.function4') }}">AI评AI工具</a>
           </li>
         </ul>
       </div>
@@ -208,7 +206,7 @@
 <main>
     <div class="container mt-5 pt-5">
         <div class="page-header animate-fade-in">
-            <h1>AI模型评估工具</h1>
+            <h1>AI评AI工具</h1>
             <p class="page-description">上传您的Excel文件，配置模型参数并选择评估Prompt，我们将使用AI模型进行评估。</p>
         </div>
         
@@ -237,15 +235,17 @@
                                 <option value="" disabled selected>正在加载模型...</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label for="prompt_name" class="form-label">Prompt模板</label>
-                            <select class="form-select" id="prompt_name" name="prompt_name" required>
-                                <option value="" disabled selected>正在加载Prompt...</option>
-                            </select>
-                        </div>
                         <div class="col-md-12 mt-2">
                             <button type="button" class="btn btn-sm btn-outline-light me-2" id="testConnectionBtn">测试连通性</button>
                             <span id="model_status" class="ms-2"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">你希望AI帮助你评测的维度是什么？（可多选）</label>
+                            <small class="form-text text-light d-block mb-2">注：以下测评维度的评测框架依据GB/T45288.2-2025 人工智能 大模型 第2部分：评测指标与方法</small>
+                            <div id="promptCheckboxesContainer" class="row">
+                                <!-- Checkboxes will be populated here by JavaScript -->
+                                <p class="text-light">正在加载Prompt...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -264,7 +264,7 @@
 </main>
 
 <footer class="container text-center mt-5" style="color: var(--secondary-color);">
-    <p>&copy; 2024 成研院-技支. 保留所有权利.</p>
+    <p>&copy; 2025 成研院-技支. 保留所有权利.</p>
 </footer>
 
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
@@ -274,7 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelKeyInput = document.getElementById('model_key');
     const modelUrlInput = document.getElementById('model_url');
     const modelNameSelect = document.getElementById('model_name');
-    const promptNameSelect = document.getElementById('prompt_name');
+    // const promptNameSelect = document.getElementById('prompt_name'); // Replaced by checkboxes
+    const promptCheckboxesContainer = document.getElementById('promptCheckboxesContainer');
     const testConnectionBtn = document.getElementById('testConnectionBtn');
     const modelStatusSpan = document.getElementById('model_status');
     const progressBarContainer = document.getElementById('progressBarContainer');
@@ -302,21 +303,44 @@ document.addEventListener('DOMContentLoaded', function() {
             modelNameSelect.innerHTML = '<option value="" disabled selected>加载模型失败</option>';
         });
 
-    // Fetch prompts for dropdown
+    // Fetch prompts for checkboxes
     fetch('{{ url_for("main.get_prompts") }}')
         .then(response => response.json())
         .then(data => {
-            promptNameSelect.innerHTML = '<option value="" disabled selected>请选择Prompt</option>'; 
-            data.forEach(prompt => {
-                const option = document.createElement('option');
-                option.value = prompt.name; 
-                option.textContent = prompt.name;
-                promptNameSelect.appendChild(option);
-            });
+            promptCheckboxesContainer.innerHTML = ''; // Clear loading message
+            if (data && data.length > 0) {
+                data.forEach(prompt => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-md-4'; // Adjust layout as needed, e.g., col-md-6 for two per row
+
+                    const formCheckDiv = document.createElement('div');
+                    formCheckDiv.className = 'form-check mb-2';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.className = 'form-check-input';
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'selected_prompts'; // Name for form submission (list)
+                    checkbox.value = prompt.name; // The value sent to backend
+                    const checkboxId = 'prompt-' + prompt.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, ''); // Create a unique ID
+                    checkbox.id = checkboxId;
+
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    label.htmlFor = checkboxId;
+                    label.textContent = prompt.name; // Display name
+
+                    formCheckDiv.appendChild(checkbox);
+                    formCheckDiv.appendChild(label);
+                    colDiv.appendChild(formCheckDiv);
+                    promptCheckboxesContainer.appendChild(colDiv);
+                });
+            } else {
+                promptCheckboxesContainer.innerHTML = '<p class="text-light">没有可用的Prompt模板。</p>';
+            }
         })
         .catch(error => {
             console.error('Error fetching prompts:', error);
-            promptNameSelect.innerHTML = '<option value="" disabled selected>加载Prompt失败</option>';
+            promptCheckboxesContainer.innerHTML = '<p class="text-danger">加载Prompt失败。</p>';
         });
 
     // Test Connection
@@ -468,41 +492,69 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function showSuccess(data) { // Changed parameter from files to data
-        progressBarContainer.style.display = 'none';
-        submitButton.disabled = false;
-        submitButton.innerHTML = '开始处理';
-        submitButton.style.opacity = '1';
-        resultArea.innerHTML = '';
-
-        const successAlert = document.createElement('div');
-        successAlert.className = 'alert alert-success mt-4 animate-fade-in';
-        successAlert.innerHTML = `<h4 class="alert-heading mb-2">处理成功！</h4><p class="mb-0">您的文件已成功处理完毕。</p>`;
-        resultArea.appendChild(successAlert);
-
-        if (data.download_url && data.processed_filename) { // Check for new properties
-            const pMessage = document.createElement('p');
-            pMessage.textContent = '请点击下方按钮下载。';
-            pMessage.className = 'text-light mt-3 mb-3 text-center';
-            resultArea.appendChild(pMessage);
-
-            const linksDiv = document.createElement('div');
-            linksDiv.className = 'text-center';
-            
-            const downloadLink = document.createElement('a');
-            downloadLink.href = data.download_url;
-            downloadLink.download = data.processed_filename;
-            downloadLink.textContent = `下载 ${data.processed_filename}`;
-            downloadLink.className = 'btn btn-success me-2 mb-2'; 
-            linksDiv.appendChild(downloadLink);
-            
-            resultArea.appendChild(linksDiv);
-        } else {
-            const pMessage = document.createElement('p');
-            pMessage.textContent = '处理完成，但未找到可下载的文件。';
-            pMessage.className = 'text-light mt-3 text-center';
-            resultArea.appendChild(pMessage);
+    function resetUIState() {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '开始处理';
+            submitButton.style.opacity = '1';
         }
+        progressBarContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+        progressBar.style.backgroundColor = 'var(--primary-color)'; // Reset progress bar color
+        resultArea.innerHTML = ''; // Clear previous results
+        // Re-enable file input if it was disabled
+        const fileInput = document.getElementById('excelFile');
+        if (fileInput) {
+            fileInput.disabled = false;
+            fileInput.value = ''; // Clear selected file
+        }
+        // Re-enable prompt selection if it was disabled
+        const promptCheckboxes = document.querySelectorAll('input[name="selected_prompts"]');
+        promptCheckboxes.forEach(checkbox => checkbox.disabled = false);
+        // Reset any other specific UI elements for function4 if needed
+    }
+
+    function showSuccess(data) { // Changed parameter from files to data
+        resetUIState();
+        resultArea.innerHTML = ''; // Clear previous results like error messages
+        let successHtml = '<div class="alert alert-success animate-fade-in">处理成功完成！</div>';
+
+        if (data.files && data.files.length > 0) {
+            successHtml += '<h5>生成的文件:</h5>';
+            successHtml += '<p class="text-light mt-3 mb-3 text-center">请点击下方按钮下载。</p>';
+            successHtml += '<div class="text-center">'; // Center the download buttons
+            data.files.forEach(file => {
+                successHtml += `<a href="${file.url}" class="btn btn-success me-2 mb-2" download="${file.name}">下载 ${file.name}</a>`;
+            });
+            successHtml += '</div>';
+        } else if (data.download_url && data.processed_filename) { // Fallback for single file scenario
+            successHtml += '<h5>生成的文件:</h5>';
+            successHtml += '<p class="text-light mt-3 mb-3 text-center">请点击下方按钮下载。</p>';
+            successHtml += '<div class="text-center">'; // Center the download buttons
+            successHtml += `<a href="${data.download_url}" class="btn btn-success me-2 mb-2" download="${data.processed_filename}">下载 ${data.processed_filename}</a>`;
+            successHtml += '</div>';
+        } else {
+            successHtml += '<p>处理完成，但没有找到可下载的文件信息。</p>';
+        }
+
+        // Display analysis results if available
+        if (data.analysis_results) {
+            successHtml += '<h5>评估指标平均分:</h5><div class="card text-white mb-3" style="background-color: rgba(0, 0, 0, 0.2); border-color: rgba(255, 255, 255, 0.2);"><div class="card-body">';
+            for (const [key, value] of Object.entries(data.analysis_results)) {
+                if (value.average !== null && value.average !== undefined) {
+                    successHtml += `<p class="card-text"><strong>${key}:</strong> ${value.average.toFixed(2)} (共 ${value.count} 条有效数据)</p>`;
+                } else {
+                    successHtml += `<p class="card-text"><strong>${key}:</strong> 无有效数据进行平均值计算</p>`;
+                }
+            }
+            successHtml += '</div></div>';
+        }
+        if (data.analysis_error){
+            successHtml += `<div class="alert alert-warning animate-fade-in">${data.analysis_error}</div>`;
+        }
+
+        resultArea.innerHTML = successHtml;
     }
 
     function showError(message) {
@@ -520,5 +572,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 </body>
 </html>

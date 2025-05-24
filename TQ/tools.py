@@ -2,7 +2,7 @@ import random
 import pandas as pd
 from datetime import datetime
 from openai import OpenAI
-import os,time,json
+import os,time,json,re
 
 def extract_and_save_to_excel(file_path, split_by='\n', extraction_type='count', count=None, percentage=None, output_dir=None):
     """
@@ -269,6 +269,49 @@ def load_prompts(file_path):
 
 
 
+def extract_numbers(text):
+    """从文本中提取所有数字（包括小数）"""
+    numbers = re.findall(r'[-+]?\d*\.\d+|[-+]?\d+', text)
+    return [float(num) for num in numbers]
+
+def analyze_excel(file_path):
+    """获取Excel中的分数并进行求值"""
+    # 读取Excel文件
+    df = pd.read_excel(file_path, engine='openpyxl')
+    
+    # 初始化结果字典
+    results = {}
+    
+    # 遍历第三列及之后的列
+    for column in df.columns[2:]:
+        results[column] = {'count': 0, 'sum': 0, 'average': None, 'scores': []}
+        numbers_list = []
+        
+        # 提取列中的数字
+        for item in df[column]:
+            # Ensure item is a string before trying to extract numbers
+            str_item = str(item)
+            # Skip processing if item is 'nan' or empty after stripping whitespace
+            if str_item.lower() == 'nan' or not str_item.strip():
+                continue
+            numbers = extract_numbers(str_item)
+            numbers_list.extend(numbers)
+            for num in numbers:
+                # Only include numbers in the calculation, assuming scores are typically positive
+                # and within a certain range, e.g. 0-5 or 0-100. Adjust as needed.
+                # For this example, let's assume scores are positive and we just sum them up.
+                # The original code had `if num <= 5:`, which might be specific to a 5-point scale.
+                # We will make it more general by just checking if it's a number.
+                results[column]['count'] += 1
+                results[column]['sum'] += num
+                results[column]['scores'].append(num)
+        
+        # 计算平均值
+        if results[column]['count'] > 0:
+            results[column]['average'] = results[column]['sum'] / results[column]['count']
+    
+    return results
+
 # 示例调用
 # extract_and_save_to_excel('cilin.txt', split_by='\n', extraction_type='count', count=10)
 # extract_and_save_to_excel('cilin.txt', split_by='\n', extraction_type='percentage', percentage=1)
@@ -289,9 +332,9 @@ prompts = load_prompts('PromptTemplate.json') # This call will now use the absol
 # url = 'https://api.siliconflow.cn/v1/'
 # model_name = 'deepseek-ai/DeepSeek-V2.5'
 # 
-# for prompt in prompts:
-#     if prompt['name'] == '流畅性评估':
-#         prompt = prompt['prompt']
+# for prompt_item in prompts: # Renamed variable to avoid conflict
+#     if prompt_item['name'] == '完整度': # Updated to a valid name from PromptTemplate.json
+#         selected_prompt = prompt_item['prompt'] # Use a different variable for the selected prompt
 #         break
 # 
-# ai_prompt_query('111.xlsx','流畅性评估',key,url,model_name,prompt)
+# ai_prompt_query('111.xlsx','完整度评估',key,url,model_name,selected_prompt) # Updated column name and prompt variable

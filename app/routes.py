@@ -7,7 +7,7 @@ import uuid
 import threading
 from urllib.parse import urlparse, urlunparse # Added for URL parsing
 import json # Added for json operations
-from TQ import tools as tq_tools # Changed to absolute import from project root
+from TQ.tools import extract_and_save_to_excel, extract_and_save_to_excel_folder, ai_prompt_query, load_prompts, analyze_excel
 
 main_bp = Blueprint('main', __name__)
 
@@ -186,37 +186,7 @@ def function1():
     # GET request handling (renders the initial page)
     return render_template('function1.html', embedding_models=embedding_models_list)
 
-@main_bp.route('/function2', methods=['GET'])
-def function2():
-    log_message = f"Accessed function2 at {datetime.now()} from {request.remote_addr} with method {request.method}"
-    current_app.logger.info(log_message)
-    # This page is for downloads, logic to list files or handle specific downloads would go here.
-    # For now, just rendering the template.
-    # Example: list files from PROCESSED_FILES_FOLDER
-    processed_files_dir = current_app.config.get('PROCESSED_FILES_FOLDER', 'processed_files')
-    if not os.path.exists(processed_files_dir):
-        os.makedirs(processed_files_dir) # Ensure it exists
-    
-    files = []
-    try:
-        # List only files, not directories, and sort by modification time (newest first)
-        file_details = []
-        for f_name in os.listdir(processed_files_dir):
-            f_path = os.path.join(processed_files_dir, f_name)
-            if os.path.isfile(f_path):
-                file_details.append({
-                    'name': f_name,
-                    'url': url_for('main.download_file', filename=f_name),
-                    'size': os.path.getsize(f_path),
-                    'modified_time': datetime.fromtimestamp(os.path.getmtime(f_path)).strftime('%Y-%m-%d %H:%M:%S')
-                })
-        # Sort files by modified time, newest first
-        files = sorted(file_details, key=lambda x: x['modified_time'], reverse=True)
-    except Exception as e:
-        current_app.logger.error(f"Error listing files in {processed_files_dir}: {e}")
-        # Optionally, pass an error message to the template
 
-    return render_template('function2.html', files=files)
 
 @main_bp.route('/function3', methods=['GET', 'POST'])
 def function3():
@@ -309,7 +279,7 @@ def function3():
                         # The tool needs to be modified to accept an output directory.
                         # For now, assume it saves to processed_folder and returns the filename.
                         # This is a conceptual call, actual implementation depends on tools.py modification.
-                        output_excel_path = tq_tools.extract_and_save_to_excel(
+                        output_excel_path = extract_and_save_to_excel(
                             single_file_path, split_by, extraction_type, count, percentage,
                             output_dir=processed_folder # Assuming tools.py is modified for this
                         )
@@ -321,7 +291,7 @@ def function3():
             elif len(uploaded_file_paths) == 1:
                 single_file_path = uploaded_file_paths[0]
                 if single_file_path.lower().endswith('.txt'):
-                    output_excel_path = tq_tools.extract_and_save_to_excel(
+                    output_excel_path = extract_and_save_to_excel(
                         single_file_path, split_by, extraction_type, count, percentage,
                         output_dir=processed_folder # Assuming tools.py is modified for this
                     )
@@ -352,21 +322,86 @@ def process_evaluation_task_background(app, task_id, params):
             tasks_status[task_id]['status'] = 'processing'
             tasks_status[task_id]['progress'] = 10
 
-            # ai_prompt_query modifies the file in-place and returns its path
-            modified_excel_path = tq_tools.ai_prompt_query(
-                params['input_excel_path'],
-                params['output_column_name'],
-                params['model_key'],
-                params['model_url'],
-                params['model_name'],
-                params['prompt_content']
-            )
-            tasks_status[task_id]['progress'] = 80
+            # Load all available prompt templates
+            all_prompts_data = []
+            try:
+                prompt_file_path_for_load = os.path.join(app.root_path, '..', 'TQ', 'PromptTemplate.json')
+                all_prompts_data = load_prompts(prompt_file_path_for_load)
+            except Exception as e:
+                current_app.logger.error(f"Task {task_id}: Failed to load prompt templates: {e}")
+                tasks_status[task_id].update({'status': 'failed', 'message': f'加载Prompt模板定义失败: {str(e)}'})
+                return # Exit the background task
 
-            if modified_excel_path and os.path.exists(modified_excel_path):
-                processed_filename = os.path.basename(modified_excel_path)
+            current_excel_path = params['input_excel_path']
+            final_modified_excel_path = None # Will store the path of the excel after all prompts are processed
+            
+            selected_prompt_names = params.get('selected_prompt_names', [])
+            total_prompts_to_process = len(selected_prompt_names)
+            prompts_processed_count = 0
+            
+            # Initial progress is 10, processing prompts will take from 10 up to 80 (70% of total progress range)
+
+            for prompt_name_iter in selected_prompt_names:
+                selected_prompt_object = next((p for p in all_prompts_data if p.get('name') == prompt_name_iter), None)
+                
+                if not selected_prompt_object or 'prompt' not in selected_prompt_object:
+                    current_app.logger.warning(f"Task {task_id}: Prompt '{prompt_name_iter}' not found or has no content in PromptTemplate.json. Skipping.")
+                    prompts_processed_count += 1
+                    if total_prompts_to_process > 0:
+                         current_progress_val = 10 + int((prompts_processed_count / total_prompts_to_process) * 70)
+                         tasks_status[task_id]['progress'] = current_progress_val
+                    if prompts_processed_count == total_prompts_to_process and final_modified_excel_path is None:
+                        tasks_status[task_id].update({'status': 'failed', 'message': '所有选择的Prompt均无效或无法处理。'})
+                    continue 
+
+                prompt_content_iter = selected_prompt_object['prompt']
+                output_column_name_iter = prompt_name_iter
+
+                current_app.logger.info(f"Task {task_id}: Processing with prompt '{prompt_name_iter}'. Input: {current_excel_path}")
+                
+                modified_excel_path_for_this_prompt = ai_prompt_query(
+                    current_excel_path, 
+                    output_column_name_iter,
+                    params['model_key'],
+                    params['model_url'],
+                    params['model_name'],
+                    prompt_content_iter
+                )
+
+                if modified_excel_path_for_this_prompt and os.path.exists(modified_excel_path_for_this_prompt):
+                    current_excel_path = modified_excel_path_for_this_prompt 
+                    final_modified_excel_path = current_excel_path 
+                    current_app.logger.info(f"Task {task_id}: Prompt '{prompt_name_iter}' processed. Output now at: {final_modified_excel_path}")
+                else:
+                    current_app.logger.error(f"Task {task_id}: Failed to process prompt '{prompt_name_iter}'. ai_prompt_query returned invalid path ('{modified_excel_path_for_this_prompt}') or file does not exist.")
+                    tasks_status[task_id].update({
+                        'status': 'failed', 
+                        'message': f"处理Prompt '{prompt_name_iter}' 失败。",
+                        'progress': tasks_status[task_id].get('progress', 10)
+                    })
+                    final_modified_excel_path = None 
+                    break 
+
+                prompts_processed_count += 1
+                if total_prompts_to_process > 0:
+                    current_progress_val = 10 + int((prompts_processed_count / total_prompts_to_process) * 70)
+                    tasks_status[task_id]['progress'] = current_progress_val
+            
+            if final_modified_excel_path:
+                 tasks_status[task_id]['progress'] = 80
+
+            if final_modified_excel_path and os.path.exists(final_modified_excel_path):
+                processed_filename = os.path.basename(final_modified_excel_path)
                 # The function is already within 'with app.app_context():'.
                 # Manually construct the relative URL to avoid issues with url_for in background threads without SERVER_NAME.
+                analysis_results = None
+                if final_modified_excel_path and os.path.exists(final_modified_excel_path):
+                    try:
+                        analysis_results = analyze_excel(final_modified_excel_path)
+                        current_app.logger.info(f'Task {task_id}: Excel analysis complete for {final_modified_excel_path}. Results: {analysis_results}')
+                    except Exception as ex_analyze:
+                        current_app.logger.error(f'Task {task_id}: Error during Excel analysis for {final_modified_excel_path}: {str(ex_analyze)}')
+                
                 relative_download_url = f"/download_file/{processed_filename}"
                 tasks_status[task_id].update({
                     'status': 'completed',
@@ -374,9 +409,10 @@ def process_evaluation_task_background(app, task_id, params):
                     'message': 'AI模型评估处理成功完成。',
                     'processed_filename': processed_filename, # Keep for potential other uses
                     'download_url': relative_download_url, # Update to relative URL
-                    'files': [{'name': processed_filename, 'url': relative_download_url}] # Add for consistency with function3
+                    'files': [{'name': processed_filename, 'url': relative_download_url}], # Add for consistency with function3
+                    'analysis_results': analysis_results
                 })
-                current_app.logger.info(f'Background AI evaluation complete for task {task_id}. Output file: {modified_excel_path}')
+                current_app.logger.info(f'Background AI evaluation complete for task {task_id}. Output file: {final_modified_excel_path}')
             else:
                 tasks_status[task_id].update({'status': 'failed', 'progress': 100, 'message': 'AI模型评估处理失败或未生成文件。'})
                 current_app.logger.error(f'Background AI evaluation failed for task {task_id}: ai_prompt_query returned None or file does not exist.')
@@ -421,38 +457,22 @@ def function4():
             model_key = request.form.get('model_key')
             model_url = request.form.get('model_url')
             model_name = request.form.get('model_name')
-            selected_prompt_name = request.form.get('prompt_name') # Matches HTML form
-            
-            # Load prompts to find the content for the selected_prompt_name
-            prompts_data_list = []
-            try:
-                prompt_file_path_for_load = os.path.join(current_app.root_path, '..', 'TQ', 'PromptTemplate.json')
-                prompts_data_list = tq_tools.load_prompts(prompt_file_path_for_load)
-            except Exception as e:
-                current_app.logger.error(f"Error loading prompts for task {task_id}: {e}")
-                tasks_status[task_id].update({'status': 'failed', 'message': '加载Prompt模板失败'})
-                return jsonify(tasks_status[task_id]), 500
+            selected_prompt_names = request.form.getlist('selected_prompts') # Get list of selected prompt names
 
-            prompt_content = ""
-            for p_data in prompts_data_list:
-                if p_data.get('name') == selected_prompt_name:
-                    prompt_content = p_data.get('prompt', '')
-                    break
-            
-            if not prompt_content:
-                tasks_status[task_id].update({'status': 'failed', 'message': '选择的Prompt模板无效或内容为空'})
+            if not selected_prompt_names:
+                tasks_status[task_id].update({'status': 'failed', 'message': '至少需要选择一个Prompt模板。'})
+                current_app.logger.error(f'Task {task_id} failed: No prompt templates selected.')
                 return jsonify(tasks_status[task_id]), 400
-
-            # Default output column name to the prompt name if not specified, or handle as needed
-            output_column_name = selected_prompt_name 
+            
+            current_app.logger.info(f'Task {task_id}: Selected prompts {selected_prompt_names}.')
+            # Prompt content loading will now happen in the background task for each selected prompt.
 
             processing_params = {
                 'input_excel_path': input_excel_path,
-                'output_column_name': output_column_name,
                 'model_key': model_key,
                 'model_url': model_url,
                 'model_name': model_name,
-                'prompt_content': prompt_content
+                'selected_prompt_names': selected_prompt_names # Pass list of names
             }
             
             thread = threading.Thread(target=process_evaluation_task_background, args=(current_app._get_current_object(), task_id, processing_params))
@@ -481,10 +501,10 @@ def get_llm_models():
         "deepseek-ai/DeepSeek-V2.5",
         "Qwen/Qwen3-30B-A3B",
         "THUDM/GLM-4-32B-0414",
-        "internlm/internlm2_5-20b-chat",
+        "internlm/internlm2_5-20b-chat"
         # Add more models as needed
-        "gpt-3.5-turbo",
-        "gpt-4"
+        # "gpt-3.5-turbo", # Removed as per request
+        # "gpt-4"          # Removed as per request
     ]
     # Convert to list of objects if frontend expects {id, name}
     # models_for_frontend = [{'id': m, 'name': m} for m in models]
@@ -494,7 +514,7 @@ def get_llm_models():
 def get_prompts():
     try:
         prompt_file_path = os.path.join(current_app.root_path, '..', 'TQ', 'PromptTemplate.json')
-        prompts_data = tq_tools.load_prompts(prompt_file_path)
+        prompts_data = load_prompts(prompt_file_path)
         if prompts_data is None: # load_prompts might return None on error
             prompts_data = []
         # Ensure it's a list of objects with 'name' and 'prompt' keys as expected by frontend
